@@ -1,0 +1,23 @@
+{
+  "name": "genekos",
+  "version": "1.0.0",
+  "main": "index.js",
+    "scripts": {
+    "dev": "concurrently -c \"cyan,magenta\" -n \"BACKEND,FRONTEND\" \"npm run dev --prefix backend\" \"npm start --prefix frontend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnisaKajtazi/GeneKos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AnisaKajtazi/GeneKos/issues"
+  },
+  "homepage": "https://github.com/AnisaKajtazi/GeneKos#readme",
+  "description": "",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
