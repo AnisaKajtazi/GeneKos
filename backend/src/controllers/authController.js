@@ -40,7 +40,7 @@ exports.register = async (req, res) => {
 
 
 exports.login = async (req, res) => {
-  console.log("Login request body:", req.body); 
+  console.log("Login attempt for user:", req.body.username); 
   try {
     const { username, password } = req.body;
 
