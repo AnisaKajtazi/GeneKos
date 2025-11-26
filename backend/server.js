@@ -25,32 +25,14 @@ const UserHealthProfile = require('./src/models/UserHealthProfile');
 
 
 
-
-
-
-
-
 const analysisResultRoutes = require('./src/routes/analysisResultRoutes');
 app.use('/api/analysis-results', analysisResultRoutes);
 app.use('/uploads', express.static('uploads'));
-
-
-
-
-
-
-
-
-
-const analysisResultRoutes = require('./src/routes/analysisResultRoutes');
-app.use('/api/analysis-results', analysisResultRoutes);
-app.use('/uploads', express.static('uploads'));
-
 
 
 const PORT = process.env.PORT || 5000;
 
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log("All tables synced!");
     app.listen(PORT, () => {

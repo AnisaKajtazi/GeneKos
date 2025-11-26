@@ -41,6 +41,7 @@ const UserAppointmentsPage = () => {
     try {
       const res = await api.get(`/appointments/user/${user.id}`);
       setAppointments(res.data);
+      setAppointments(res.data.appointments);
     } catch (err) {
       console.error(err);
     }

@@ -91,3 +91,47 @@ exports.getUserAppointments = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getPendingAppointments = async (req, res) => {
+  try {
+    const appointments = await AppointmentRequest.findAll({
+      where: { status: 'pending' },
+      order: [['request_date', 'ASC']]
+    });
+    return res.json(appointments);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.approveAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointment = await AppointmentRequest.findByPk(id);
+    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+    appointment.status = 'scheduled';
+    await appointment.save();
+    return res.json({ message: "Appointment approved", appointment });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.cancelAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const appointment = await AppointmentRequest.findByPk(id);
+    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+
+    appointment.status = 'cancelled';
+    await appointment.save();
+    return res.json({ message: "Appointment cancelled", appointment });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
