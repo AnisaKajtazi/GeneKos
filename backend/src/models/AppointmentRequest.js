@@ -15,8 +15,14 @@ const AppointmentRequest = sequelize.define('AppointmentRequest', {
     defaultValue: 'pending'
   },
 
-  scheduled_date: { type: DataTypes.DATE, allowNull: true },
-  note: { type: DataTypes.TEXT, allowNull: true }
+  scheduled_date: { type: DataTypes.STRING, allowNull: true },
+  note: { type: DataTypes.TEXT, allowNull: true },
+  
+  request_date: {
+  type: DataTypes.DATE,
+  defaultValue: DataTypes.NOW
+}
+
 });
 
 module.exports = AppointmentRequest;
