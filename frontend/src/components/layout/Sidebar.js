@@ -15,14 +15,29 @@ const Sidebar = () => {
     if (!user) return null;
 
     switch(user.role) {
+
       case 'user':
         return (
           <>
             <Link to="/analyses">Analizat</Link>
             <Link to="/diets">Dietat</Link>
             <Link to="/activities">Aktivitetet</Link>
+            <Link to="/chat">Chat</Link>
           </>
         );
+
+      case 'clinic':
+        return (
+          <>
+            <Link to="/users">Pacientët</Link>
+            <Link to="/analyses">Analizat</Link>
+            <Link to="/diets">Dietat</Link>
+            <Link to="/activities">Aktivitetet</Link>
+            <Link to="/upload-analysis">Upload Analysis PDF</Link>
+            <Link to="/chat">Chat</Link> 
+          </>
+        );
+
       case 'admin':
         return (
           <>
@@ -35,17 +50,7 @@ const Sidebar = () => {
             <Link to="/roles">Sign Up & Permissions</Link>
           </>
         );
-      case 'clinic':
-        return (
-          <>
-            <Link to="/users">Pacientët</Link>
-            <Link to="/analyses">Analizat</Link>
-            <Link to="/diets">Dietat</Link>
-            <Link to="/activities">Aktivitetet</Link>
-             <Link to="/upload-analysis">Upload Analysis PDF</Link>
 
-          </>
-        );
       default:
         return null;
     }
@@ -53,23 +58,46 @@ const Sidebar = () => {
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ width: '250px', backgroundColor: '#f0f0f0', padding: '20px', minHeight: '100vh' }}>
-        <h2>GeneKos {user?.role === 'admin' ? 'Admin' : user?.role === 'clinic' ? 'Clinic' : ''}</h2>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+      <div style={{
+        width: '250px',
+        backgroundColor: '#f0f0f0',
+        padding: '20px',
+        minHeight: '100vh'
+      }}>
+        
+        <h2>
+          GeneKos {user?.role === 'admin'
+            ? 'Admin'
+            : user?.role === 'clinic'
+            ? 'Clinic'
+            : ''}
+        </h2>
+
+        <nav style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          marginTop: '20px'
+        }}>
           {renderLinks()}
-          <button onClick={handleLogout} style={{
-            marginTop: '20px',
-            padding: '10px',
-            backgroundColor: '#ff4d4f',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer'
-          }}>
+
+          <button
+            onClick={handleLogout}
+            style={{
+              marginTop: '20px',
+              padding: '10px',
+              backgroundColor: '#ff4d4f',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }}
+          >
             Logout
           </button>
         </nav>
       </div>
+
       <div style={{ flex: 1, padding: '20px' }}>
         
       </div>
