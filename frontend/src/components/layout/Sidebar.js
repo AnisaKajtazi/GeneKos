@@ -18,6 +18,7 @@ const Sidebar = () => {
       case 'user':
         return (
           <>
+            <Link to="/dashboard/client/appointments">Appointments</Link>
             <Link to="/analyses">Analizat</Link>
             <Link to="/diets">Dietat</Link>
             <Link to="/activities">Aktivitetet</Link>
@@ -38,6 +39,7 @@ const Sidebar = () => {
       case 'clinic':
         return (
           <>
+            <Link to="/dashboard/clinic/appointments">Appointments</Link>
             <Link to="/users">Pacientët</Link>
             <Link to="/analyses">Analizat</Link>
             <Link to="/diets">Dietat</Link>
@@ -69,7 +71,6 @@ const Sidebar = () => {
         </nav>
       </div>
       <div style={{ flex: 1, padding: '20px' }}>
-        
       </div>
     </div>
   );
