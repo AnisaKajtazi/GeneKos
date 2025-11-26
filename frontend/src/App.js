@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import UserAppointmentsPage from './pages/client/UserAppointmentsPage';
 import ClinicAppointmentsPage from './pages/clinic/ClinicAppointmentsPage';
+import UploadAnalysisForm from './components/UploadAnalysisForm';
 
 function App() {
   return (
@@ -24,7 +25,11 @@ function App() {
             <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
             <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
           </Route>
-
+          <Route path="/upload-analysis" element={
+            <ProtectedRoute>
+              <UploadAnalysisForm />
+            </ProtectedRoute>
+          } />
           <Route path="/" element={<Login />} />
         </Routes>
       </BrowserRouter>

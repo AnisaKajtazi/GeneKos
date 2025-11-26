@@ -44,6 +44,8 @@ const Sidebar = () => {
             <Link to="/analyses">Analizat</Link>
             <Link to="/diets">Dietat</Link>
             <Link to="/activities">Aktivitetet</Link>
+             <Link to="/upload-analysis">Upload Analysis PDF</Link>
+
           </>
         );
       default:
