@@ -1,4 +1,4 @@
-const messageRepo = require("../repositories/messageRepository");
+const messageRepo = require("../domain/repositories/messageRepository");
 
 module.exports = {
   sendMessage: async (data) => {

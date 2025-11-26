@@ -1,4 +1,4 @@
-const { createAnalysisResult } = require('../services/analysisResultService');
+const { createAnalysisResult } = require('../../services/analysisResultService');
 
 const uploadAnalysisPDF = async (req, res) => {
   try {

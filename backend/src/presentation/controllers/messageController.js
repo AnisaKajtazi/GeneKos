@@ -1,4 +1,4 @@
-const messageService = require("../services/messageService");
+const messageService = require("../../services/messageService");
 
 module.exports = {
   sendMessage: async (req, res) => {

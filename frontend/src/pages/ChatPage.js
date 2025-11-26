@@ -39,7 +39,7 @@ const ChatPage = () => {
 
       <div style={{ flex: 1, padding: "10px" }}>
         {!selectedChatUser ? (
-          <p>Zgjidh një përdorues për të chat-uar</p>
+          <p>Zgjidh një përdorues për të biseduar</p>
         ) : (
           <>
             <h4>Chat me: {selectedChatUser.first_name} {selectedChatUser.last_name}</h4>

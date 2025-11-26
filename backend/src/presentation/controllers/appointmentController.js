@@ -1,4 +1,4 @@
-const AppointmentRequest = require("../models/AppointmentRequest");
+const AppointmentRequest = require("../../domain/models/AppointmentRequest");
 const { slots, isValidSlot } = require("../utils/appointmentSlots");
 const { Op } = require("sequelize");
 
