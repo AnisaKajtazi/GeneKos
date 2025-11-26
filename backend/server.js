@@ -12,6 +12,18 @@ app.use('/api/auth', authRoutes);
 const sequelize = require('./src/config/db');
 const User = require('./src/models/User');
 
+
+
+
+
+
+
+
+const analysisResultRoutes = require('./src/routes/analysisResultRoutes');
+app.use('/api/analysis-results', analysisResultRoutes);
+app.use('/uploads', express.static('uploads'));
+
+
 const PORT = 5000;
 
 sequelize.sync({ alter: true })
