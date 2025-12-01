@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext'; 
+
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -9,7 +10,13 @@ import Dashboard from './pages/Dashboard';
 import UserAppointmentsPage from './pages/client/UserAppointmentsPage';
 import ClinicAppointmentsPage from './pages/clinic/ClinicAppointmentsPage';
 import UploadAnalysisForm from './components/UploadAnalysisForm';
-import ChatPage from './pages/ChatPage';
+import ChatPage from './pages/chat/ChatPage';
+
+const ChatWrapper = () => {
+  const { user } = useContext(AuthContext);
+  if (!user) return <p>Loading...</p>;
+  return <ChatPage currentUser={user} />;
+};
 
 function App() {
   return (
@@ -25,20 +32,15 @@ function App() {
                 <Dashboard />
               </ProtectedRoute>
             }>
-            <Route path="client/appointments" element={<UserAppointmentsPage />} />
-            <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
-            <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
-
+              <Route path="client/appointments" element={<UserAppointmentsPage />} />
+              <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
+              <Route path="chat" element={<ChatWrapper />} />
+              <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
             </Route>
-          <Route path="/upload-analysis" element={
-                        <ProtectedRoute>
-                          <UploadAnalysisForm />
-                        </ProtectedRoute>
-                      } />
 
-            <Route path="/chat" element={
+            <Route path="/upload-analysis" element={
               <ProtectedRoute>
-                <ChatPage />
+                <UploadAnalysisForm />
               </ProtectedRoute>
             } />
 

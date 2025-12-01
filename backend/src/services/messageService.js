@@ -1,11 +1,17 @@
-const messageRepo = require("../domain/repositories/messageRepository");
+const Message = require("../domain/models/Message");
 
-module.exports = {
-  sendMessage: async (data) => {
-    return await messageRepo.createMessage(data);
-  },
-
-  getConversation: async (user1, user2) => {
-    return await messageRepo.getConversation(user1, user2);
-  },
+const getMessagesBetween = async (senderId, receiverId) => {
+  return Message.findAll({
+    where: {
+      senderId,
+      receiverId
+    },
+    order: [["createdAt", "ASC"]],
+  });
 };
+
+const saveMessage = async (senderId, receiverId, content) => {
+  return Message.create({ senderId, receiverId, content });
+};
+
+module.exports = { getMessagesBetween, saveMessage };
