@@ -2,7 +2,6 @@ const AppointmentRequest = require("../../domain/models/AppointmentRequest");
 const { slots, isValidSlot } = require("../utils/appointmentSlots");
 const { Op } = require("sequelize");
 
-
 exports.createAppointment = async (req, res) => {
   try {
     const { user_id, scheduled_date, note } = req.body;
@@ -10,12 +9,18 @@ exports.createAppointment = async (req, res) => {
     if (!user_id || !scheduled_date)
       return res.status(400).json({ message: "user_id and scheduled_date are required" });
 
-    const time = scheduled_date.slice(11, 16);
+    const today = new Date().setHours(0, 0, 0, 0);
+    const chosen = new Date(scheduled_date).setHours(0, 0, 0, 0);
 
+    if (chosen < today) {
+      return res.status(400).json({ message: "Past dates are not allowed" });
+    }
+ 
+
+    const time = scheduled_date.slice(11, 16);
 
     if (!isValidSlot(time))
       return res.status(400).json({ message: "Invalid slot selected" });
-
 
     const exists = await AppointmentRequest.findOne({
       where: {
@@ -51,11 +56,10 @@ exports.getAvailableSlots = async (req, res) => {
     const { date } = req.query;
     if (!date) return res.status(400).json({ message: "Date is required" });
 
-
     const appointments = await AppointmentRequest.findAll({
       where: {
         scheduled_date: {
-          [Op.like]: `${date}%`  
+          [Op.like]: `${date}%`
         },
         status: { [Op.in]: ["pending", "scheduled"] }
       }
@@ -63,7 +67,6 @@ exports.getAvailableSlots = async (req, res) => {
 
     const takenSlots = appointments.map(a => a.scheduled_date.slice(11, 16));
 
-    
     const availableSlots = slots.filter(slot => !takenSlots.includes(slot));
 
     return res.json({ date, available_slots: availableSlots });
@@ -92,6 +95,7 @@ exports.getUserAppointments = async (req, res) => {
   }
 };
 
+
 exports.getPendingAppointments = async (req, res) => {
   try {
     const appointments = await AppointmentRequest.findAll({
@@ -108,30 +112,36 @@ exports.getPendingAppointments = async (req, res) => {
 exports.approveAppointment = async (req, res) => {
   try {
     const { id } = req.params;
+
     const appointment = await AppointmentRequest.findByPk(id);
     if (!appointment) return res.status(404).json({ message: "Appointment not found" });
 
     appointment.status = 'scheduled';
     await appointment.save();
+
     return res.json({ message: "Appointment approved", appointment });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
+
 exports.cancelAppointment = async (req, res) => {
   try {
     const { id } = req.params;
+
     const appointment = await AppointmentRequest.findByPk(id);
     if (!appointment) return res.status(404).json({ message: "Appointment not found" });
 
     appointment.status = 'cancelled';
     await appointment.save();
+
     return res.json({ message: "Appointment cancelled", appointment });
+
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
-

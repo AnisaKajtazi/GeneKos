@@ -11,9 +11,10 @@ const AppointmentRequest = sequelize.define('AppointmentRequest', {
   },
 
   status: {
-    type: DataTypes.ENUM('pending', 'scheduled', 'completed', 'cancelled'),
+    type: DataTypes.ENUM('pending', 'scheduled', 'completed', 'cancelled', 'missed'),
     defaultValue: 'pending'
   },
+
 
   scheduled_date: { type: DataTypes.STRING, allowNull: true },
   note: { type: DataTypes.TEXT, allowNull: true },

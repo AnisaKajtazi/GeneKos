@@ -11,7 +11,7 @@ import UserAppointmentsPage from './pages/client/UserAppointmentsPage';
 import ClinicAppointmentsPage from './pages/clinic/ClinicAppointmentsPage';
 import UploadAnalysisForm from './components/UploadAnalysisForm';
 import ChatPage from './pages/chat/ChatPage';
-
+import PatientDataPage from './pages/clinic/PatientData/PatientDataPage';
 const ChatWrapper = () => {
   const { user } = useContext(AuthContext);
   if (!user) return <p>Loading...</p>;
@@ -34,6 +34,7 @@ function App() {
             }>
               <Route path="client/appointments" element={<UserAppointmentsPage />} />
               <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
+              <Route path="clinic/PatientData" element={<PatientDataPage />} />
               <Route path="chat" element={<ChatWrapper />} />
               <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
             </Route>

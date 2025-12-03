@@ -95,10 +95,16 @@ const UserAppointmentsPage = () => {
       <div style={{ marginTop: '20px' }}>
         <h3>Request Appointment</h3>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <label>
-            Date:
-            <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)} />
-          </label>
+         <label>
+              Date:
+              <input
+                type="date"
+                value={selectedDate}
+                min={new Date().toISOString().split("T")[0]}
+                onChange={e => setSelectedDate(e.target.value)}
+              />
+            </label>
+
 
           <label>
             Slot:

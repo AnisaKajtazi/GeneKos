@@ -43,10 +43,12 @@ const Sidebar = () => {
             <Link to="/dashboard/clinic/appointments" style={linksStyle("/dashboard/clinic/appointments")}>Appointments</Link>
             <Link to="/users" style={linksStyle("/users")}>Pacientët</Link>
             <Link to="/analyses" style={linksStyle("/analyses")}>Analizat</Link>
-            <Link to="/diets" style={linksStyle("/diets")}>Dietat</Link>
+            {/* <Link to="/diets" style={linksStyle("/diets")}>Dietat</Link>
             <Link to="/activities" style={linksStyle("/activities")}>Aktivitetet</Link>
-            <Link to="/upload-analysis" style={linksStyle("/upload-analysis")}>Upload Analysis PDF</Link>
+            <Link to="/upload-analysis" style={linksStyle("/upload-analysis")}>Upload Analysis PDF</Link> */}
             <Link to="/dashboard/chat" style={linksStyle("/dashboard/chat")}>💬 Chat</Link>
+            <Link to="/dashboard/clinic/PatientData" style={linksStyle("/dashboard/clinic/PatientData")}>Shto të dhënat e pacientit</Link>
+
           </>
         );
       case 'admin':
