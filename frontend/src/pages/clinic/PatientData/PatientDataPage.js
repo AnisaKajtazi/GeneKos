@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ActivityForm from "./ActivityForm";
+import DietForm from "./DietForm";
 import api from '../../../api/axios';
 
 const PatientDataPage = () => {
@@ -66,6 +67,18 @@ const PatientDataPage = () => {
               <h4>Aktivitetet</h4>
               <ActivityForm patientId={selectedPatient.id} />
             </div>
+
+            <div
+  style={{
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    padding: "15px",
+    width: "300px"
+  }}
+>
+  <h4>Dieta</h4>
+  <DietForm patientId={selectedPatient.id} />
+</div>
 
           </div>
 

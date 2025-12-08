@@ -23,6 +23,7 @@ const analysisResultRoutes = require("./src/presentation/routes/analysisResultRo
 const messageRoutes = require("./src/presentation/routes/messageRoutes");
 const userRoutes = require("./src/presentation/routes/usersRoutes");
 const activityRoutes = require('./src/presentation/routes/activityRoutes');
+const dietRoutes = require('./src/presentation/routes/dietRoutes');
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -31,6 +32,8 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use('/api/activities', activityRoutes);
+app.use("/api/diets", dietRoutes);
+
 
 
 const sequelize = require("./src/infrastructure/config/db");
