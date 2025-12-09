@@ -15,8 +15,11 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
-
+// --------------------
+// Routes
+// --------------------
 const authRoutes = require("./src/presentation/routes/authRoutes");
 const appointmentRoutes = require("./src/presentation/routes/appointmentRoutes");
 const analysisResultRoutes = require("./src/presentation/routes/analysisResultRoutes");
@@ -30,15 +33,15 @@ app.use("/api/appointments", appointmentRoutes);
 app.use("/api/analysis-results", analysisResultRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
-app.use("/uploads", express.static("uploads"));
-app.use('/api/activities', activityRoutes);
+app.use("/api/activities", activityRoutes);
 app.use("/api/diets", dietRoutes);
 
-
-
+// --------------------
+// Database
+// --------------------
 const sequelize = require("./src/infrastructure/config/db");
 
-
+// Models
 const User = require("./src/domain/models/User");
 const Activity = require("./src/domain/models/Activity");
 const AnalysisResult = require("./src/domain/models/AnalysisResult");
@@ -47,6 +50,21 @@ const Diet = require("./src/domain/models/Diet");
 const UserHealthProfile = require("./src/domain/models/UserHealthProfile");
 const Message = require("./src/domain/models/Message");
 
+// --------------------
+// Associations
+// --------------------
+
+// AnalysisResults belong to AppointmentRequest
+AppointmentRequest.hasMany(AnalysisResult, { foreignKey: 'request_id' });
+AnalysisResult.belongsTo(AppointmentRequest, { foreignKey: 'request_id' });
+
+// You can add other associations here if needed, e.g.:
+// User.hasMany(Activity);
+// Activity.belongsTo(User);
+
+// --------------------
+// Cron job
+// --------------------
 cron.schedule("*/5 * * * *", async () => {
   try {
     const now = new Date();
@@ -67,7 +85,9 @@ cron.schedule("*/5 * * * *", async () => {
   }
 });
 
-
+// --------------------
+// Socket.IO
+// --------------------
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -121,6 +141,9 @@ io.on("connection", (socket) => {
   });
 });
 
+// --------------------
+// Start server
+// --------------------
 const PORT = process.env.PORT || 5000;
 
 sequelize

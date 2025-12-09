@@ -9,7 +9,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import UserAppointmentsPage from './pages/client/UserAppointmentsPage';
 import ClinicAppointmentsPage from './pages/clinic/ClinicAppointmentsPage';
-import UploadAnalysisForm from './components/UploadAnalysisForm';
 import ChatPage from './pages/chat/ChatPage';
 import PatientDataPage from './pages/clinic/PatientData/PatientDataPage';
 const ChatWrapper = () => {
@@ -38,12 +37,6 @@ function App() {
               <Route path="chat" element={<ChatWrapper />} />
               <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
             </Route>
-
-            <Route path="/upload-analysis" element={
-              <ProtectedRoute>
-                <UploadAnalysisForm />
-              </ProtectedRoute>
-            } />
 
             <Route path="/" element={<Login />} />
           </Routes>

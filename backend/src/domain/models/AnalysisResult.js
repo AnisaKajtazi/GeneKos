@@ -10,8 +10,20 @@ const AnalysisResult = sequelize.define('AnalysisResult', {
     references: { model: 'AppointmentRequests', key: 'id' }
   },
 
-  pdf_url: { type: DataTypes.STRING, allowNull: false },
-  uploaded_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
+  analysis_type: { 
+    type: DataTypes.STRING,
+    allowNull: false 
+  },
+
+  pdf_url: { 
+    type: DataTypes.STRING, 
+    allowNull: false 
+  },
+
+  uploaded_at: { 
+    type: DataTypes.DATE, 
+    defaultValue: DataTypes.NOW 
+  }
 });
 
 module.exports = AnalysisResult;
