@@ -12,8 +12,14 @@ const Diet = sequelize.define('Diet', {
 
   request_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: { model: 'AppointmentRequests', key: 'id' }
+  },
+
+  analysis_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: { model: 'AnalysisResults', key: 'id' } 
   },
 
   diet_plan: { type: DataTypes.TEXT, allowNull: false },

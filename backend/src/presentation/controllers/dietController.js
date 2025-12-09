@@ -3,29 +3,27 @@ const AppointmentRequest = require("../../domain/models/AppointmentRequest");
 
 exports.createDiet = async (req, res) => {
   try {
-    const { user_id, request_id, diet_plan } = req.body;
+    const { user_id, request_id, diet_plan, analysis_id } = req.body;
 
     if (!user_id || !diet_plan)
       return res.status(400).json({ message: "User ID and diet plan are required" });
-
-    let appointment = null;
+    
     if (request_id) {
-      appointment = await AppointmentRequest.findOne({
+      const appointment = await AppointmentRequest.findOne({
         where: { id: request_id, user_id },
       });
       if (!appointment)
-        return res
-          .status(404)
-          .json({ message: "Appointment not found for this user" });
+        return res.status(404).json({ message: "Appointment not found for this user" });
     }
 
-    const diet = await Diet.create({ user_id, request_id, diet_plan });
+    const diet = await Diet.create({ user_id, request_id, diet_plan, analysis_id });
     return res.status(201).json({ message: "Diet added successfully", diet });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 exports.getUserDiets = async (req, res) => {
   try {

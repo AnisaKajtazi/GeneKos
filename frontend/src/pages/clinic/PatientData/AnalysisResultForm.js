@@ -31,7 +31,7 @@ const AnalysisResultForm = ({ patientId }) => {
 
     const formData = new FormData();
     formData.append("pdf", file);
-    formData.append("request_id", 1); // or the proper request ID
+    formData.append("request_id", 1); 
     formData.append("analysis_type", analysisType);
 
     try {

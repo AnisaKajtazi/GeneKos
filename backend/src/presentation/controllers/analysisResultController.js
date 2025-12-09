@@ -19,17 +19,15 @@ const uploadAnalysisPDF = async (req, res) => {
   }
 };
 
-// NEW: Get all analysis results for a user
 const getAnalysisResultsByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
-    // Find all analysis results for this user's appointments
     const results = await AnalysisResult.findAll({
       include: [{
         model: AppointmentRequest,
         where: { user_id: userId },
-        attributes: ['id', 'scheduled_date', 'status'] // optional, can include info about the appointment
+        attributes: ['id', 'scheduled_date', 'status'] 
       }],
       order: [['uploaded_at', 'DESC']]
     });
