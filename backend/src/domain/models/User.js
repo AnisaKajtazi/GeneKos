@@ -12,7 +12,8 @@ const User = sequelize.define('User', {
   phone: { type: DataTypes.STRING, allowNull: true },
   gender: { type: DataTypes.ENUM('male', 'female', 'other'), allowNull: true },
   date_of_birth: { type: DataTypes.DATEONLY, allowNull: true },
-  address: { type: DataTypes.STRING, allowNull: true }
+  address: { type: DataTypes.STRING, allowNull: true },
+  is_active: {type: DataTypes.BOOLEAN, defaultValue: true}
 });
 
 module.exports = User;

@@ -24,6 +24,8 @@ const messageRoutes = require("./src/presentation/routes/messageRoutes");
 const userRoutes = require("./src/presentation/routes/usersRoutes");
 const activityRoutes = require('./src/presentation/routes/activityRoutes');
 const dietRoutes = require('./src/presentation/routes/dietRoutes');
+const adminUsersRoutes = require("./src/presentation/routes/adminUsersRoutes");
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -32,6 +34,8 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/diets", dietRoutes);
+app.use("/api/admin/users", adminUsersRoutes);
+
 
 const sequelize = require("./src/infrastructure/config/db");
 
@@ -122,13 +126,14 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || 5000;
 
 sequelize
-  .sync()
+  .sync({ alter: true })
   .then(() => {
     console.log("All tables synced!");
     httpServer.listen(PORT, () => {
       console.log(`[BACKEND] Server running on http://localhost:${PORT}`);
     });
   })
+
   .catch((err) => {
     console.error("Sync error:", err);
   });

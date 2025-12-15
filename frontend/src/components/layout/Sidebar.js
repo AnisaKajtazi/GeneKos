@@ -37,24 +37,27 @@ const Sidebar = () => {
             <Link to="/dashboard/chat" style={linksStyle("/dashboard/chat")}>💬 Chat</Link>
           </>
         );
+
       case 'clinic':
         return (
           <>
             <Link to="/dashboard/clinic/appointments" style={linksStyle("/dashboard/clinic/appointments")}>Appointments</Link>
             <Link to="/users" style={linksStyle("/users")}>Pacientët</Link>
             <Link to="/analyses" style={linksStyle("/analyses")}>Analizat</Link>
-            {/* <Link to="/diets" style={linksStyle("/diets")}>Dietat</Link>
+            {/* Opsionale për më vonë
+            <Link to="/diets" style={linksStyle("/diets")}>Dietat</Link>
             <Link to="/activities" style={linksStyle("/activities")}>Aktivitetet</Link>
-            <Link to="/upload-analysis" style={linksStyle("/upload-analysis")}>Upload Analysis PDF</Link> */}
+            <Link to="/upload-analysis" style={linksStyle("/upload-analysis")}>Upload Analysis PDF</Link>
+            */}
             <Link to="/dashboard/chat" style={linksStyle("/dashboard/chat")}>💬 Chat</Link>
             <Link to="/dashboard/clinic/PatientData" style={linksStyle("/dashboard/clinic/PatientData")}>Shto të dhënat e pacientit</Link>
-
           </>
         );
+
       case 'admin':
         return (
           <>
-            <Link to="/users" style={linksStyle("/users")}>Pacientët</Link>
+            <Link to="/dashboard/users" style={linksStyle("/dashboard/users")}>Pacientët</Link>
             <Link to="/clinics" style={linksStyle("/clinics")}>Klinikat</Link>
             <Link to="/analyses" style={linksStyle("/analyses")}>Analizat</Link>
             <Link to="/diets" style={linksStyle("/diets")}>Dietat</Link>
@@ -63,6 +66,7 @@ const Sidebar = () => {
             <Link to="/roles" style={linksStyle("/roles")}>Sign Up & Permissions</Link>
           </>
         );
+
       default:
         return null;
     }
