@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect, useRef } from "react";
 import { SocketContext } from "../../context/SocketContext";
 import axios from "axios";
+import '../../styles/chatpage.css';
 
 const ChatWindow = ({ user, currentUser }) => {
   const socket = useContext(SocketContext);
@@ -85,67 +86,120 @@ const ChatWindow = ({ user, currentUser }) => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const SendIcon = () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  );
+
+  const OnlineIcon = () => (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+      <circle cx="5" cy="5" r="5" />
+    </svg>
+  );
+
+  if (!user) {
+    return (
+      <div className="chat-welcome">
+        <div className="welcome-icon">💬</div>
+        <h2 className="welcome-title">Zgjidhni një kontakt</h2>
+        <p className="welcome-message">Zgjidhni një kontakt nga lista për të filluar bisedën</p>
+      </div>
+    );
+  }
+
+  const userDisplayName = user.id === "clinic" 
+    ? "Klinika GeneKos"
+    : `${user.first_name || ''} ${user.last_name || ''}`.trim();
+
   return (
-    <div style={{ flex: 1, padding: "10px", display: "flex", flexDirection: "column", height: "100%" }}>
-      <h4 style={{ marginBottom: "10px" }}>
-        Chat with {user.id === "clinic" ? "Clinic" : `${user.first_name} ${user.last_name}`}
-      </h4>
-
-      <div style={{
-        border: "1px solid #ccc",
-        borderRadius: "10px",
-        padding: "10px",
-        flex: 1,
-        overflowY: "auto",
-        marginBottom: "10px",
-        backgroundColor: "#f9f9f9"
-      }}>
-        {messages.map((m, i) => {
-          const isCurrentUser = m.senderId === currentUser.id;
-          const align = isCurrentUser ? "right" : "left";
-
-          let senderName = "Clinic";
-          if (m.senderId && usersMap[m.senderId]) {
-            senderName = `${usersMap[m.senderId].first_name} ${usersMap[m.senderId].last_name}`;
-          } else if (isCurrentUser) {
-            senderName = "You";
-          }
-
-          return (
-            <div key={i} style={{ textAlign: align, marginBottom: "8px" }}>
-              <div style={{ fontSize: "0.75em", color: "#555", marginBottom: "2px" }}>
-                {senderName}
-              </div>
-              <span style={{
-                backgroundColor: isCurrentUser ? "#DCF8C6" : "#FFF",
-                padding: "5px 10px",
-                borderRadius: "10px",
-                display: "inline-block",
-                maxWidth: "70%",
-                wordBreak: "break-word",
-                boxShadow: "0 1px 2px rgba(0,0,0,0.1)"
-              }}>
-                {m.content}
-              </span>
+    <div className="chat-window-container">
+      <div className="chat-window-header">
+        <div className="chat-partner-info">
+          <div className="partner-avatar">
+            {userDisplayName[0]?.toUpperCase() || 'U'}
+          </div>
+          <div className="partner-details">
+            <h3 className="partner-name">{userDisplayName}</h3>
+            <div className="partner-status">
+              <OnlineIcon />
+              <span className="status-text">Online</span>
             </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
+          </div>
+        </div>
       </div>
 
-      <div style={{ display: "flex", gap: "5px" }}>
-        <input
-          style={{ flex: 1, padding: "8px", borderRadius: "5px", border: "1px solid #ccc" }}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Type a message..."
-        />
-        <button
-          style={{ padding: "8px 15px", borderRadius: "5px", border: "none", backgroundColor: "#4CAF50", color: "#fff" }}
-          onClick={sendMessage}
-        >
-          Send
-        </button>
+      <div className="messages-container">
+        {messages.length === 0 ? (
+          <div className="no-messages">
+            <div className="no-messages-icon">💬</div>
+            <h4>Nuk ka mesazhe</h4>
+            <p>Bisedoni me {userDisplayName} për të filluar një bisedë të re</p>
+          </div>
+        ) : (
+          <div className="messages-list">
+            {messages.map((message, index) => {
+              const isCurrentUser = message.senderId === currentUser.id;
+              
+              let senderName = "Klinika";
+              if (message.senderId && usersMap[message.senderId]) {
+                senderName = `${usersMap[message.senderId].first_name} ${usersMap[message.senderId].last_name}`;
+              } else if (isCurrentUser) {
+                senderName = "Ju";
+              }
+
+              return (
+                <div 
+                  key={message._id || index} 
+                  className={`message-wrapper ${isCurrentUser ? 'sent' : 'received'}`}
+                >
+                  <div className="message-sender">{senderName}</div>
+                  <div className="message-bubble">
+                    <div className="message-content">{message.content}</div>
+                    <div className="message-time">
+                      {new Date(message.createdAt || Date.now()).toLocaleTimeString('sq-AL', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
+
+      <div className="message-input-container">
+        <div className="input-wrapper">
+          <textarea
+            className="message-input"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Shkruani mesazhin tuaj këtu..."
+            rows={1}
+          />
+          <button
+            className="send-button"
+            onClick={sendMessage}
+            disabled={!text.trim()}
+          >
+            <SendIcon />
+          </button>
+        </div>
+        <p className="input-hint">
+          Shtypni <kbd>Enter</kbd> për të dërguar, <kbd>Shift + Enter</kbd> për rresht të ri
+        </p>
       </div>
     </div>
   );

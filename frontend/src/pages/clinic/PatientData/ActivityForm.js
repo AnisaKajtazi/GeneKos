@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../api/axios";
+import '../../../styles/formstyles.css';
 
 const ActivityForm = ({ patientId }) => {
   const [activityPlan, setActivityPlan] = useState("");
   const [activities, setActivities] = useState([]);
   const [message, setMessage] = useState("");
-
+  const [messageType, setMessageType] = useState(""); 
 
   const fetchActivities = async () => {
     try {
@@ -13,7 +14,7 @@ const ActivityForm = ({ patientId }) => {
       setActivities(res.data.activities);
     } catch (err) {
       console.error(err);
-      setMessage("Gabim gjatë marrjes së aktiviteteve.");
+      showMessage("Gabim gjatë marrjes së aktiviteteve.", "error");
     }
   };
 
@@ -23,11 +24,20 @@ const ActivityForm = ({ patientId }) => {
     }
   }, [patientId]);
 
+  const showMessage = (text, type) => {
+    setMessage(text);
+    setMessageType(type);
+    setTimeout(() => {
+      setMessage("");
+      setMessageType("");
+    }, 5000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!activityPlan.trim()) {
-      setMessage("Shkruaj aktivitetin para se ta dërgosh.");
+      showMessage("Shkruaj aktivitetin para se ta dërgosh.", "error");
       return;
     }
 
@@ -38,46 +48,85 @@ const ActivityForm = ({ patientId }) => {
         activity_plan: activityPlan,
       });
 
-      setMessage("Aktiviteti u shtua me sukses!");
+      showMessage("Aktiviteti u shtua me sukses!", "success");
       setActivityPlan("");
       fetchActivities();
     } catch (err) {
       console.error(err);
-      setMessage(
-        err.response?.data?.message || "Gabim gjatë shtimit të aktivitetit."
+      showMessage(
+        err.response?.data?.message || "Gabim gjatë shtimit të aktivitetit.",
+        "error"
       );
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <textarea
-          value={activityPlan}
-          onChange={(e) => setActivityPlan(e.target.value)}
-          placeholder="Shkruaj aktivitetin e pacientit..."
-          rows={5}
-          style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-        />
-        <button type="submit" style={{ padding: "8px 12px" }}>
+    <div className="form-container">
+      <form onSubmit={handleSubmit} className="form">
+        <div className="form-group">
+          <label htmlFor="activityPlan" className="form-label">
+            Plan i Aktivitetit
+          </label>
+          <textarea
+            id="activityPlan"
+            value={activityPlan}
+            onChange={(e) => setActivityPlan(e.target.value)}
+            placeholder="Përshkruani aktivitetet fizike të rekomanduara..."
+            rows={4}
+            className="form-textarea"
+          />
+          <p className="form-hint">
+            P.sh: Stërvitje 30 min në ditë, ecje, not, etj.
+          </p>
+        </div>
+        <button type="submit" className="btn-submit">
           Shto Aktivitet
         </button>
       </form>
 
-      {message && <p style={{ marginTop: "10px" }}>{message}</p>}
-
-      <h4 style={{ marginTop: "20px" }}>Aktivitetet ekzistuese</h4>
-      {activities.length === 0 ? (
-        <p>Nuk ka aktivitete për këtë pacient.</p>
-      ) : (
-        <ul>
-          {activities.map((a) => (
-            <li key={a.id}>
-              {a.activity_plan} <small>({new Date(a.created_at).toLocaleString()})</small>
-            </li>
-          ))}
-        </ul>
+      {message && (
+        <div className={`message ${messageType}`}>
+          <span className="message-icon">
+            {messageType === "success" ? "✓" : "!"}
+          </span>
+          {message}
+        </div>
       )}
+
+      <div className="existing-items">
+        <div className="section-header">
+          <h4>Aktivitetet ekzistuese</h4>
+          <span className="count-badge">{activities.length}</span>
+        </div>
+        
+        {activities.length === 0 ? (
+          <div className="empty-state">
+            <span className="empty-state-icon">🏃‍♂️</span>
+            <p>Nuk ka aktivitete për këtë pacient.</p>
+          </div>
+        ) : (
+          <div className="items-list">
+            {activities.map((a) => (
+              <div key={a.id} className="item-card">
+                <div className="item-content">
+                  <p className="item-text">{a.activity_plan}</p>
+                  <div className="item-meta">
+                    <span className="date">
+                      {new Date(a.created_at).toLocaleDateString('sq-AL', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
