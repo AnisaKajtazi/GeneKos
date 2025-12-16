@@ -10,7 +10,7 @@ const PatientDataPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Debounce search to avoid too many requests
+  
   useEffect(() => {
     if (!searchTerm) {
       setSelectedPatient(null);
@@ -35,7 +35,7 @@ const PatientDataPage = () => {
       } finally {
         setLoading(false);
       }
-    }, 500); // wait 500ms after typing
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);

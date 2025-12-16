@@ -57,13 +57,11 @@ const Sidebar = () => {
       case 'admin':
         return (
           <>
-            <Link to="/dashboard/users" style={linksStyle("/dashboard/users")}>Pacientët</Link>
-            <Link to="/clinics" style={linksStyle("/clinics")}>Klinikat</Link>
+            <Link to="/dashboard/users" style={linksStyle("/dashboard/users")}>Users</Link>
             <Link to="/analyses" style={linksStyle("/analyses")}>Analizat</Link>
             <Link to="/diets" style={linksStyle("/diets")}>Dietat</Link>
-            <Link to="/activities" style={linksStyle("/activities")}>Aktivitetet</Link>
-            <Link to="/auditlogs" style={linksStyle("/auditlogs")}>Audit Logs</Link>
-            <Link to="/roles" style={linksStyle("/roles")}>Sign Up & Permissions</Link>
+           <Link to="/dashboard/activities" style={linksStyle("/dashboard/activities")}>Aktivitetet</Link>
+            <Link to="/dashboard/audit-logs" style={linksStyle("/dashboard/auditlogs")}>Audit Logs</Link>
           </>
         );
 
