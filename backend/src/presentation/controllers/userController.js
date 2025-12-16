@@ -4,13 +4,16 @@ const User = require("../../domain/models/User");
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      where: { is_active: true }
+    });
     res.json(users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gabim serveri" });
   }
 };
+
 
 
 exports.getUserById = async (req, res) => {
@@ -55,14 +58,14 @@ exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ message: "Përdoruesi nuk u gjet" });
-
-    await user.destroy();
-    res.json({ message: "Përdoruesi u fshi me sukses" });
+    await user.update({ is_active: false });
+    res.json({ message: "Përdoruesi u fshi me sukses (soft delete)" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Gabim serveri" });
   }
 };
+
 
 
 exports.searchUsers = async (req, res) => {
