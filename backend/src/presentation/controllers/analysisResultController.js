@@ -39,4 +39,45 @@ const getAnalysisResultsByUser = async (req, res) => {
   }
 };
 
-module.exports = { uploadAnalysisPDF, getAnalysisResultsByUser };
+const updateAnalysisPDF = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { analysis_type } = req.body;
+
+    const analysis = await AnalysisResult.findByPk(id);
+    if (!analysis) return res.status(404).json({ message: 'Analysis not found' });
+
+    analysis.analysis_type = analysis_type || analysis.analysis_type;
+    if (req.file) {
+      analysis.pdf_url = `/uploads/analyses/${req.file.filename}`;
+    }
+
+    await analysis.save();
+    res.json({ message: 'Analysis updated successfully', analysis });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const deleteAnalysisResult = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const analysis = await AnalysisResult.findByPk(id);
+    if (!analysis) return res.status(404).json({ message: 'Analysis not found' });
+
+    await analysis.destroy();
+    res.json({ message: 'Analysis deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {
+  uploadAnalysisPDF,
+  getAnalysisResultsByUser,
+  updateAnalysisPDF,
+  deleteAnalysisResult
+};
