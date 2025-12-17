@@ -6,11 +6,16 @@ const ActivityForm = ({ patientId }) => {
   const [activityPlan, setActivityPlan] = useState("");
   const [activities, setActivities] = useState([]);
   const [analyses, setAnalyses] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+
   const [selectedAnalysis, setSelectedAnalysis] = useState("");
+  const [selectedAppointment, setSelectedAppointment] = useState("");
+
   const [editingActivityId, setEditingActivityId] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
 
   const fetchActivities = async () => {
     try {
@@ -18,7 +23,6 @@ const ActivityForm = ({ patientId }) => {
       setActivities(res.data.activities || []);
     } catch (err) {
       console.error(err);
-      showMessage("Gabim gjatë marrjes së aktiviteteve.", "error");
       setActivities([]);
     }
   };
@@ -32,12 +36,26 @@ const ActivityForm = ({ patientId }) => {
     }
   };
 
+  const fetchAppointments = async () => {
+    try {
+      const res = await api.get(`/appointments/user/${patientId}`);
+      const completed = (res.data.appointments || []).filter(
+        (a) => a.status.toLowerCase() === "completed"
+      );
+      setAppointments(completed);
+    } catch {
+      setAppointments([]);
+    }
+  };
+
   useEffect(() => {
     if (patientId) {
       fetchActivities();
       fetchAnalyses();
+      fetchAppointments();
     }
   }, [patientId]);
+
 
   const showMessage = (text, type) => {
     setMessage(text);
@@ -48,12 +66,23 @@ const ActivityForm = ({ patientId }) => {
     }, 5000);
   };
 
+  const resetForm = () => {
+    setActivityPlan("");
+    setSelectedAnalysis("");
+    setSelectedAppointment("");
+    setEditingActivityId(null);
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!activityPlan.trim()) {
-      showMessage("Shkruaj aktivitetin para se ta dërgosh.", "error");
-      return;
+      return showMessage("Shkruaj planin e aktivitetit.", "error");
+    }
+
+    if (!selectedAppointment) {
+      return showMessage("Zgjidh një takim.", "error");
     }
 
     setSubmitting(true);
@@ -62,21 +91,20 @@ const ActivityForm = ({ patientId }) => {
         await api.put(`/activities/${editingActivityId}`, {
           activity_plan: activityPlan,
           analysis_id: selectedAnalysis || null,
+          request_id: selectedAppointment,
         });
         showMessage("Aktiviteti u përditësua me sukses!", "success");
-        setEditingActivityId(null);
       } else {
         await api.post("/activities", {
           user_id: patientId,
-          request_id: 1,
+          request_id: selectedAppointment,
           activity_plan: activityPlan,
           analysis_id: selectedAnalysis || null,
         });
         showMessage("Aktiviteti u shtua me sukses!", "success");
       }
 
-      setActivityPlan("");
-      setSelectedAnalysis("");
+      resetForm();
       fetchActivities();
     } catch (err) {
       console.error(err);
@@ -89,6 +117,7 @@ const ActivityForm = ({ patientId }) => {
   const handleEdit = (a) => {
     setActivityPlan(a.activity_plan);
     setSelectedAnalysis(a.analysis_id || "");
+    setSelectedAppointment(a.request_id);
     setEditingActivityId(a.id);
   };
 
@@ -105,11 +134,7 @@ const ActivityForm = ({ patientId }) => {
     }
   };
 
-  const handleCancelEdit = () => {
-    setActivityPlan("");
-    setSelectedAnalysis("");
-    setEditingActivityId(null);
-  };
+  const handleCancelEdit = () => resetForm();
 
   const EditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -147,6 +172,23 @@ const ActivityForm = ({ patientId }) => {
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
+          <label className="form-label">Zgjidh Takimin *</label>
+          <select
+            value={selectedAppointment}
+            onChange={(e) => setSelectedAppointment(e.target.value)}
+            className="form-select"
+            required
+          >
+            <option value="">Zgjidh takimin</option>
+            {appointments.map((a) => (
+              <option key={a.id} value={a.id}>
+                {new Date(a.scheduled_date).toLocaleString("sq-AL")}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
           <label className="form-label">
             {editingActivityId ? "Përditëso Plan Aktiviteti" : "Plan Aktiviteti"}
           </label>
@@ -163,23 +205,22 @@ const ActivityForm = ({ patientId }) => {
           <label className="form-label">
             <AnalysisIcon /> Lidh me Analizë <span className="optional">(Opsionale)</span>
           </label>
-
           <select
             value={selectedAnalysis}
             onChange={(e) => setSelectedAnalysis(e.target.value)}
             className="form-select"
           >
-            <option value="">Nuk ka analizë e lidhur</option>
+            <option value="">Pa analizë</option>
             {analyses.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.analysis_type || "Analizë"} –{" "}
+                {a.analysis_type} –{" "}
                 {new Date(a.uploaded_at || a.createdAt).toLocaleDateString("sq-AL")}
               </option>
             ))}
           </select>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
           {editingActivityId && (
             <button
               type="button"
@@ -404,7 +445,7 @@ const ActivityForm = ({ patientId }) => {
         @keyframes pulse {
           0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
           70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(16,  185, 129, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
         
         @media (max-width: 768px) {

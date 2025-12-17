@@ -7,6 +7,8 @@ const DietForm = ({ patientId }) => {
   const [diets, setDiets] = useState([]);
   const [analyses, setAnalyses] = useState([]);
   const [selectedAnalysis, setSelectedAnalysis] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState("");
+  const [appointments, setAppointments] = useState([]);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const [editingDietId, setEditingDietId] = useState(null);
@@ -33,10 +35,20 @@ const DietForm = ({ patientId }) => {
     }
   };
 
+  const fetchAppointments = async () => {
+    try {
+      const res = await api.get(`/appointments/user/${patientId}`);
+      setAppointments((res.data.appointments || []).filter(a => a.status.toLowerCase() === "completed"));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     if (patientId) {
       fetchDiets();
       fetchAnalyses();
+      fetchAppointments();
     }
   }, [patientId]);
 
@@ -49,73 +61,67 @@ const DietForm = ({ patientId }) => {
     }, 5000);
   };
 
+  const resetForm = () => {
+    setDietPlan("");
+    setSelectedAnalysis("");
+    setSelectedRequest("");
+    setEditingDietId(null);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!dietPlan.trim()) {
-      showMessage("Shkruaj dietën para se ta dërgosh.", "error");
-      return;
-    }
+    if (!dietPlan.trim()) return showMessage("Shkruaj dietën para se ta dërgosh.", "error");
+    if (!selectedRequest) return showMessage("Zgjidhni një takim.", "error");
 
     setSubmitting(true);
     try {
+      const payload = {
+        user_id: patientId,
+        request_id: selectedRequest,
+        diet_plan: dietPlan,
+        analysis_id: selectedAnalysis || null,
+      };
+
       if (editingDietId) {
-        await api.put(`/diets/${editingDietId}`, {
-          diet_plan: dietPlan,
-          analysis_id: selectedAnalysis || null,
-        });
+        await api.put(`/diets/${editingDietId}`, payload);
         showMessage("Dieta u përditësua me sukses!", "success");
         setEditingDietId(null);
       } else {
-        await api.post("/diets", {
-          user_id: patientId,
-          request_id: 1,
-          diet_plan: dietPlan,
-          analysis_id: selectedAnalysis || null,
-        });
+        await api.post("/diets", payload);
         showMessage("Dieta u shtua me sukses!", "success");
       }
 
-      setDietPlan("");
-      setSelectedAnalysis("");
+      resetForm();
       fetchDiets();
     } catch (err) {
       console.error(err);
-      showMessage(
-        err.response?.data?.message || "Gabim gjatë shtimit/përditësimit të dietës.",
-        "error"
-      );
+      showMessage(err.response?.data?.message || "Gabim gjatë shtimit/përditësimit të dietës.", "error");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("A jeni të sigurt që dëshironi ta fshini këtë dietë?")) return;
-
-    try {
-      await api.delete(`/diets/${id}`);
-      showMessage("Dieta u fshi me sukses!", "success");
-      fetchDiets();
-    } catch (err) {
-      console.error(err);
-      showMessage(
-        err.response?.data?.message || "Gabim gjatë fshirjes së dietës.",
-        "error"
-      );
     }
   };
 
   const handleEdit = (diet) => {
     setDietPlan(diet.diet_plan);
     setSelectedAnalysis(diet.analysis_id || "");
+    setSelectedRequest(diet.request_id || "");
     setEditingDietId(diet.id);
   };
 
   const handleCancelEdit = () => {
-    setDietPlan("");
-    setSelectedAnalysis("");
-    setEditingDietId(null);
+    resetForm();
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("A jeni të sigurt që dëshironi ta fshini këtë dietë?")) return;
+    try {
+      await api.delete(`/diets/${id}`);
+      showMessage("Dieta u fshi me sukses!", "success");
+      fetchDiets();
+    } catch (err) {
+      console.error(err);
+      showMessage(err.response?.data?.message || "Gabim gjatë fshirjes së dietës.", "error");
+    }
   };
 
   const EditIcon = () => (
@@ -144,18 +150,41 @@ const DietForm = ({ patientId }) => {
     </svg>
   );
 
+  const DietIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+      <path d="M7 2v20" />
+      <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+    </svg>
+  );
+
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
+          <label className="form-label">Zgjidh Takimin *</label>
+          <select 
+            value={selectedRequest} 
+            onChange={e => setSelectedRequest(e.target.value)} 
+            className="form-select"
+            required
+          >
+            <option value="">Zgjidh takimin</option>
+            {appointments.map(a => (
+              <option key={a.id} value={a.id}>{new Date(a.scheduled_date).toLocaleString("sq-AL")}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
           <label className="form-label">
             {editingDietId ? "Përditëso Plan Dietik" : "Plan Dietik"}
           </label>
-          <textarea
-            value={dietPlan}
-            onChange={(e) => setDietPlan(e.target.value)}
-            placeholder="Përshkruani dietën e rekomanduar..."
-            rows={4}
+          <textarea 
+            value={dietPlan} 
+            onChange={e => setDietPlan(e.target.value)} 
+            rows={4} 
+            placeholder="Përshkruani dietën..."
             className="form-textarea"
           />
         </div>
@@ -164,23 +193,21 @@ const DietForm = ({ patientId }) => {
           <label className="form-label">
             <AnalysisIcon /> Lidh me Analizë <span className="optional">(Opsionale)</span>
           </label>
-
-          <select
-            value={selectedAnalysis}
-            onChange={(e) => setSelectedAnalysis(e.target.value)}
+          <select 
+            value={selectedAnalysis} 
+            onChange={e => setSelectedAnalysis(e.target.value)} 
             className="form-select"
           >
-            <option value="">Nuk ka analizë e lidhur</option>
-            {analyses.map((a) => (
+            <option value="">Pa analizë</option>
+            {analyses.map(a => (
               <option key={a.id} value={a.id}>
-                {a.analysis_type || "Analizë"} –{" "}
-                {new Date(a.uploaded_at || a.createdAt).toLocaleDateString("sq-AL")}
+                {a.analysis_type || "Analizë"} – {new Date(a.uploaded_at || a.createdAt).toLocaleDateString("sq-AL")}
               </option>
             ))}
           </select>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
           {editingDietId && (
             <button
               type="button"
@@ -231,7 +258,7 @@ const DietForm = ({ patientId }) => {
                 animation: 'spin 1s linear infinite'
               }}></div>
             ) : editingDietId ? (
-              'Përditëso Dietë'
+              'Përditëso Dietën'
             ) : (
               'Shto Dietë'
             )}

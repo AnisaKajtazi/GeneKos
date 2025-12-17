@@ -5,6 +5,7 @@ const emptyForm = {
   user_id: "",
   request_id: "",
   diet_plan: "",
+  analysis_id: "",
 };
 
 const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
@@ -13,7 +14,6 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
   const [requests, setRequests] = useState([]);
 
   const token = localStorage.getItem("token");
-
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -44,8 +44,11 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const data = res.data.appointments || res.data || [];
-        const formattedRequests = data.map((r) => ({
+        const completedAppointments = (res.data.appointments || res.data || []).filter(
+          (r) => r.status === "completed"
+        );
+
+        const formattedRequests = completedAppointments.map((r) => ({
           ...r,
           label: `Appointment ${r.id} - ${new Date(r.scheduled_date).toLocaleString()}`,
         }));
@@ -63,7 +66,6 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
 
     fetchRequests();
   }, [form.user_id, token]);
-
 
   useEffect(() => {
     if (editingDiet) setForm(editingDiet);
@@ -101,13 +103,14 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
       </div>
 
       <div style={{ marginBottom: "10px" }}>
-        <label>Appointment Request (optional):</label>
+        <label>Appointment Request:</label>
         <select
           name="request_id"
           value={form.request_id || ""}
           onChange={handleChange}
+          required
         >
-          <option value="">-- None --</option>
+          <option value="">-- Select Completed Appointment --</option>
           {requests.map((r) => (
             <option key={r.id} value={r.id}>
               {r.label}
@@ -132,10 +135,7 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
         <button type="submit" style={{ marginRight: "10px" }}>
           {editingDiet ? "Update" : "Create"}
         </button>
-
-        <button type="button" onClick={onCancel}>
-          Cancel
-        </button>
+        <button type="button" onClick={onCancel}>Cancel</button>
       </div>
     </form>
   );

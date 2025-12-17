@@ -21,26 +21,28 @@ const createAuditLog = async ({ userId, username, role, action, entity, entityId
 
 exports.createActivity = async (req, res) => {
   try {
-    const { user_id, request_id, activity_plan } = req.body;
+    const { user_id, request_id, activity_plan, analysis_id } = req.body;
 
-    if (!user_id || !activity_plan) {
-      return res.status(400).json({ message: "User ID and activity plan are required" });
+    if (!user_id || !request_id || !activity_plan) {
+      return res.status(400).json({
+        message: "User ID, appointment dhe activity plan janë të detyrueshme"
+      });
     }
 
-    let appointment = null;
-    if (request_id) {
-      appointment = await AppointmentRequest.findOne({
-        where: { id: request_id, user_id }
-      });
+    const appointment = await AppointmentRequest.findOne({
+      where: { id: request_id, user_id }
+    });
 
-      if (!appointment) {
-        return res.status(404).json({ message: "Appointment not found for this user" });
-      }
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Takimi i zgjedhur nuk ekziston për këtë pacient"
+      });
     }
 
     const activity = await Activity.create({
       user_id,
-      request_id: request_id || null,
+      request_id,
+      analysis_id: analysis_id || null,
       activity_plan
     });
 
@@ -52,16 +54,17 @@ exports.createActivity = async (req, res) => {
         action: "create",
         entity: "Activity",
         entityId: activity.id,
-        description: `U krijua aktiviteti për user_id=${user_id}`
+        description: `U krijua aktivitet për request_id=${request_id}`
       });
     }
 
-    return res.status(201).json(activity);
+    res.status(201).json(activity);
   } catch (err) {
     console.error("CREATE ACTIVITY ERROR:", err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 
 exports.getUserActivities = async (req, res) => {
   try {
@@ -121,24 +124,43 @@ exports.getAllActivities = async (req, res) => {
 exports.updateActivity = async (req, res) => {
   try {
     const { id } = req.params;
-    const { activity_plan, analysis_id } = req.body;
+    const { activity_plan, analysis_id, request_id } = req.body;
 
     const activity = await Activity.findByPk(id);
     if (!activity) {
       return res.status(404).json({ message: "Activity not found" });
     }
 
-    activity.activity_plan = activity_plan ?? activity.activity_plan;
-    activity.analysis_id = analysis_id ?? activity.analysis_id;
+    if (request_id && request_id !== activity.request_id) {
+      const appointment = await AppointmentRequest.findOne({
+        where: {
+          id: request_id,
+          user_id: activity.user_id,
+        },
+      });
+
+      if (!appointment) {
+        return res.status(400).json({
+          message: "Takimi i zgjedhur nuk është valid për këtë pacient",
+        });
+      }
+
+      activity.request_id = request_id;
+    }
+
+    if (activity_plan !== undefined) activity.activity_plan = activity_plan;
+    if (analysis_id !== undefined) activity.analysis_id = analysis_id;
 
     await activity.save();
 
-    return res.json(activity);
+    res.json(activity);
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    console.error("UPDATE ACTIVITY ERROR:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 exports.deleteActivity = async (req, res) => {
   try {

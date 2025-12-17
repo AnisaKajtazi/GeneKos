@@ -10,11 +10,12 @@ const Activity = sequelize.define('Activity', {
     references: { model: 'Users', key: 'id' }
   },
 
-  request_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: { model: 'AppointmentRequests', key: 'id' }
-  },
+request_id: {
+  type: DataTypes.INTEGER,
+  allowNull: false,
+  references: { model: 'AppointmentRequests', key: 'id' }
+},
+
 
   analysis_id: {
     type: DataTypes.INTEGER,

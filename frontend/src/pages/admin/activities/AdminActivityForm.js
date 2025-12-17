@@ -14,7 +14,6 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
 
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -30,7 +29,6 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
     fetchUsers();
   }, [token]);
 
-
   useEffect(() => {
     const fetchRequests = async () => {
       if (!form.user_id) {
@@ -45,8 +43,11 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const data = res.data.appointments || res.data || [];
-        const formattedRequests = data.map((r) => ({
+        const completedAppointments = (res.data.appointments || res.data || []).filter(
+          (r) => r.status === "completed" 
+        );
+
+        const formattedRequests = completedAppointments.map((r) => ({
           ...r,
           label: `Appointment ${r.id} - ${new Date(r.scheduled_date).toLocaleString()}`,
         }));
@@ -64,7 +65,6 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
 
     fetchRequests();
   }, [form.user_id, token]);
-
 
   useEffect(() => {
     if (editingActivity) setForm(editingActivity);
@@ -102,13 +102,14 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
       </div>
 
       <div style={{ marginBottom: "10px" }}>
-        <label>Appointment Request (optional):</label>
+        <label>Appointment Request:</label>
         <select
           name="request_id"
           value={form.request_id || ""}
           onChange={handleChange}
+          required
         >
-          <option value="">-- None --</option>
+          <option value="">-- Select Completed Appointment --</option>
           {requests.map((r) => (
             <option key={r.id} value={r.id}>
               {r.label}

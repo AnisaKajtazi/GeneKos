@@ -14,33 +14,31 @@ const AdminDietsPage = () => {
   const fetchDiets = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/admin/diets', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setDiets(res.data);
-    } catch (err) {
-      console.error(err);
-      alert("Gabim në marrjen e dietave");
+      const res = await axios.get(
+        'http://localhost:5000/api/admin/diets',
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setDiets(res.data.diets || []);
+    } catch {
+      alert("Error fetching diets");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchDiets();
-  }, []);
+  useEffect(() => { fetchDiets(); }, []);
 
   const handleSave = async (data) => {
     try {
       if (editingDiet) {
         await axios.put(
-          `http://localhost:5000/api/admin/diets/${editingDiet.id}`,
+          `http://localhost:5000/api/diets/${editingDiet.id}`,
           data,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          'http://localhost:5000/api/admin/diets',
+          'http://localhost:5000/api/diets',
           data,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -51,21 +49,21 @@ const AdminDietsPage = () => {
       fetchDiets();
     } catch (err) {
       console.error(err);
-      alert("Gabim gjatë ruajtjes së dietës");
+      alert("Error saving diet");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("A je i sigurt?")) return;
+    if (!window.confirm("Are you sure?")) return;
     try {
       await axios.delete(
-        `http://localhost:5000/api/admin/diets/${id}`,
+        `http://localhost:5000/api/diets/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchDiets();
     } catch (err) {
       console.error(err);
-      alert("Gabim gjatë fshirjes së dietës");
+      alert("Error deleting diet");
     }
   };
 
@@ -81,39 +79,19 @@ const AdminDietsPage = () => {
 
   return (
     <div>
-      <h1>Dietat</h1>
+      <h1>Diets</h1>
 
       {!showForm && (
-        <button
-          onClick={() => setShowForm(true)}
-          style={{
-            marginBottom: "15px",
-            padding: "6px 12px",
-            backgroundColor: "#2196F3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={() => setShowForm(true)} style={{ marginBottom: "15px", padding: "6px 12px", backgroundColor: "#2196F3", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
           Create Diet
         </button>
       )}
 
       {showForm && (
-        <AdminDietForm
-          editingDiet={editingDiet}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
+        <AdminDietForm editingDiet={editingDiet} onSave={handleSave} onCancel={handleCancel} />
       )}
 
-      <AdminDietsTable
-        diets={diets}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <AdminDietsTable diets={diets} loading={loading} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   );
 };

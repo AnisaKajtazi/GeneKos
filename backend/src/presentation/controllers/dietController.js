@@ -1,4 +1,5 @@
-const Diet = require('../../domain/models/Diet');
+const Diet = require('../../domain/models/Diet'); 
+const AnalysisResult = require('../../domain/models/AnalysisResult');
 const AppointmentRequest = require('../../domain/models/AppointmentRequest');
 const User = require('../../domain/models/User');
 const AuditLog = require('../../domain/models/AuditLog');
@@ -21,23 +22,22 @@ const createAuditLog = async ({ userId, username, role, action, entity, entityId
 
 exports.createDiet = async (req, res) => {
   try {
-    const { user_id, request_id, diet_plan } = req.body;
+    const { user_id, request_id, diet_plan, analysis_id } = req.body;
 
-    if (!user_id || !diet_plan) {
-      return res.status(400).json({ message: "User ID and diet plan are required" });
+    if (!user_id || !request_id || !diet_plan) {
+      return res.status(400).json({ message: "User ID, request ID and diet plan are required" });
     }
 
-    if (request_id) {
-      const appointment = await AppointmentRequest.findByPk(request_id);
-      if (!appointment) {
-        return res.status(404).json({ message: "Appointment not found" });
-      }
+    const appointment = await AppointmentRequest.findByPk(request_id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
     }
 
     const diet = await Diet.create({
       user_id,
-      request_id: request_id || null,
-      diet_plan
+      request_id,
+      diet_plan,
+      analysis_id: analysis_id || null
     });
 
     if (req.user) {
@@ -62,12 +62,10 @@ exports.createDiet = async (req, res) => {
 exports.getUserDiets = async (req, res) => {
   try {
     const { userId } = req.params;
-
     const diets = await Diet.findAll({
       where: { user_id: userId },
       order: [['created_at', 'DESC']]
     });
-
     return res.json({ diets });
   } catch (err) {
     console.error(err);
@@ -78,12 +76,8 @@ exports.getUserDiets = async (req, res) => {
 exports.getDietById = async (req, res) => {
   try {
     const { id } = req.params;
-
     const diet = await Diet.findByPk(id);
-    if (!diet) {
-      return res.status(404).json({ message: "Diet not found" });
-    }
-
+    if (!diet) return res.status(404).json({ message: "Diet not found" });
     return res.json(diet);
   } catch (err) {
     console.error(err);
@@ -91,26 +85,27 @@ exports.getDietById = async (req, res) => {
   }
 };
 
-
 exports.getAllDiets = async (req, res) => {
   try {
     const diets = await Diet.findAll({
       include: [
+        { model: User, attributes: ['id', 'first_name', 'last_name'], required: false },
         {
-          model: User,
-          attributes: ['id', 'first_name', 'last_name'],
-          required: false 
-        },
-        {
-          model: AppointmentRequest,
-          attributes: ['id', 'scheduled_date', 'status'],
-          required: false 
+          model: AnalysisResult,
+          attributes: ['id', 'analysis_type'],
+          required: false,
+          include: [
+            {
+              model: AppointmentRequest,
+              attributes: ['id', 'scheduled_date', 'status'],
+              required: false
+            }
+          ]
         }
       ],
       order: [['created_at', 'DESC']]
     });
-
-    return res.json(diets);
+    return res.json({ diets });
   } catch (err) {
     console.error("GET ALL DIETS ERROR:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
@@ -118,21 +113,25 @@ exports.getAllDiets = async (req, res) => {
 };
 
 
+
 exports.updateDiet = async (req, res) => {
   try {
     const { id } = req.params;
-    const { diet_plan, analysis_id } = req.body;
+    const { diet_plan, analysis_id, request_id } = req.body;
 
     const diet = await Diet.findByPk(id);
-    if (!diet) {
-      return res.status(404).json({ message: "Diet not found" });
+    if (!diet) return res.status(404).json({ message: "Diet not found" });
+
+    if (request_id) {
+      const appointment = await AppointmentRequest.findByPk(request_id);
+      if (!appointment) return res.status(404).json({ message: "Appointment not found" });
+      diet.request_id = request_id;
     }
 
     diet.diet_plan = diet_plan ?? diet.diet_plan;
     diet.analysis_id = analysis_id ?? diet.analysis_id;
 
     await diet.save();
-
     return res.json(diet);
   } catch (err) {
     console.error(err);
@@ -140,15 +139,11 @@ exports.updateDiet = async (req, res) => {
   }
 };
 
-
 exports.deleteDiet = async (req, res) => {
   try {
     const { id } = req.params;
-
     const diet = await Diet.findByPk(id);
-    if (!diet) {
-      return res.status(404).json({ message: "Diet not found" });
-    }
+    if (!diet) return res.status(404).json({ message: "Diet not found" });
 
     await diet.destroy();
     return res.json({ message: "Diet deleted successfully" });
