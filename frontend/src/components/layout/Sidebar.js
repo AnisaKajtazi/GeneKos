@@ -26,13 +26,13 @@ const Sidebar = () => {
             <Link to="/dashboard/client/appointments" className={linkClass("/dashboard/client/appointments")}>
               Appointments
             </Link>
-            <Link to="/analyses" className={linkClass("/analyses")}>
+            <Link to="/dashboard/client/analyses" className={linkClass("/dashboard/client/analyses")}>
               Analizat
             </Link>
-            <Link to="/diets" className={linkClass("/diets")}>
+            <Link to="/dashboard/client/diets" className={linkClass("/dashboard/client/diets")}>
               Dietat
             </Link>
-            <Link to="/activities" className={linkClass("/activities")}>
+            <Link to="/dashboard/client//activities" className={linkClass("/dashboard/client//activities")}>
               Aktivitetet
             </Link>
             <Link to="/dashboard/chat" className={linkClass("/dashboard/chat")}>
@@ -66,7 +66,7 @@ const Sidebar = () => {
       case 'admin':
         return (
           <>
-            <Link to="/dashboard/users" className={linkClass("/dashboard/users")}>Pacientët</Link>
+            <Link to="/dashboard/users" className={linkClass("/dashboard/users")}>Users</Link>
             <Link to="/analyses" className={linkClass("/analyses")}>Analizat</Link>
             <Link to="/dashboard/diets" className={linkClass("/dashboard/diets")}>Dietat</Link>
             <Link to="/dashboard/activities" className={linkClass("/dashboard/activities")}>Aktivitetet</Link>
