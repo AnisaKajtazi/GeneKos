@@ -23,6 +23,7 @@ const Diet = sequelize.define('Diet', {
   },
 
   diet_plan: { type: DataTypes.TEXT, allowNull: false },
+
   created_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
 });
 

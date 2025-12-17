@@ -1,117 +1,17 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../api/axios";
-import '../../../styles/formstyles.css';
+import "../../../styles/formstyles.css";
+
+const BACKEND_URL = "http://localhost:5000";
 
 const AnalysisResultForm = ({ patientId }) => {
   const [analysisType, setAnalysisType] = useState("");
   const [file, setFile] = useState(null);
-  const [results, setResults] = useState([]);
+  const [analyses, setAnalyses] = useState([]);
+  const [editingId, setEditingId] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
-  const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-
-  const fetchAnalysisResults = async () => {
-    try {
-      const res = await api.get(`/analysis/user/${patientId}`);
-      setResults(res.data || []);
-    } catch (err) {
-      console.error(err);
-      showMessage("Gabim gjatë marrjes së analizave.", "error");
-      setResults([]);
-    }
-  };
-
-  useEffect(() => {
-    if (patientId) fetchAnalysisResults();
-  }, [patientId]);
-
-  const showMessage = (text, type) => {
-    setMessage(text);
-    setMessageType(type);
-    setTimeout(() => {
-      setMessage("");
-      setMessageType("");
-    }, 5000);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!analysisType.trim() || (!file && !editingId)) {
-      showMessage("Shkruaj llojin e analizës dhe zgjidh PDF-në.", "error");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const formData = new FormData();
-      formData.append("analysis_type", analysisType);
-      if (file) formData.append("pdf", file);
-
-      if (editingId) {
-        if (!file) {
-          formData.delete('pdf'); 
-        }
-
-        await api.put(`/analysis/${editingId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        showMessage("Analiza u përditësua me sukses!", "success");
-        setEditingId(null);
-      } else {
-        formData.append("request_id", 1); 
-        await api.post("/analysis/upload", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        showMessage("Analiza u ngarkua me sukses!", "success");
-      }
-
-      setAnalysisType("");
-      setFile(null);
-      fetchAnalysisResults();
-    } catch (err) {
-      console.error(err);
-      showMessage("Gabim gjatë ngarkimit të analizës.", "error");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm("A jeni të sigurt që dëshironi ta fshini këtë analizë?")) return;
-
-    try {
-      await api.delete(`/analysis/${id}`);
-      showMessage("Analiza u fshi me sukses!", "success");
-      fetchAnalysisResults();
-    } catch (err) {
-      console.error(err);
-      showMessage("Gabim gjatë fshirjes së analizës.", "error");
-    }
-  };
-
-
-  const handleEdit = (analysis) => {
-    setAnalysisType(analysis.analysis_type);
-    setEditingId(analysis.id);
-  };
-
-  const handleCancelEdit = () => {
-    setAnalysisType("");
-    setFile(null);
-    setEditingId(null);
-  };
-
-
-  const FileIcon = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <line x1="16" y1="13" x2="8" y2="13" />
-      <line x1="16" y1="17" x2="8" y2="17" />
-      <polyline points="10 9 9 9 8 9" />
-    </svg>
-  );
 
   const EditIcon = () => (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -139,34 +39,138 @@ const AnalysisResultForm = ({ patientId }) => {
     </svg>
   );
 
-  const handleOpenPDF = (url) => {
-    const pdfLink = url.startsWith("/") ? url : `/uploads/${url}`;
-    window.open(pdfLink, "_blank");
+  const fetchAnalyses = async () => {
+    try {
+      const res = await api.get(`/analysis/user/${patientId}`);
+      setAnalyses(res.data || []);
+    } catch (err) {
+      console.error(err);
+      showMessage("Gabim gjatë marrjes së analizave.", "error");
+    }
+  };
+
+  useEffect(() => {
+    if (patientId) fetchAnalyses();
+  }, [patientId]);
+
+  const showMessage = (text, type) => {
+    setMessage(text);
+    setMessageType(type);
+    setTimeout(() => {
+      setMessage("");
+      setMessageType("");
+    }, 5000);
+  };
+
+  const resetForm = () => {
+    setAnalysisType("");
+    setFile(null);
+    setEditingId(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!analysisType.trim()) {
+      showMessage("Shkruani llojin e analizës.", "error");
+      return;
+    }
+
+    if (!editingId && !file) {
+      showMessage("Ju lutem ngarkoni një PDF.", "error");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("analysis_type", analysisType);
+      formData.append("request_id", patientId);
+
+      if (file) {
+        formData.append("pdf", file);
+      }
+
+      if (editingId) {
+        await api.put(`/analysis/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        showMessage("Analiza u përditësua me sukses!", "success");
+      } else {
+        await api.post("/analysis/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        showMessage("Analiza u shtua me sukses!", "success");
+      }
+
+      resetForm();
+      fetchAnalyses();
+    } catch (err) {
+      console.error(err);
+      showMessage(
+        err.response?.data?.message || "Gabim gjatë ruajtjes së analizës.",
+        "error"
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEdit = (analysis) => {
+    setEditingId(analysis.id);
+    setAnalysisType(analysis.analysis_type);
+    setFile(null);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("A jeni të sigurt që dëshironi ta fshini analizën?"))
+      return;
+
+    try {
+      await api.delete(`/analysis/${id}`);
+      showMessage("Analiza u fshi me sukses!", "success");
+      fetchAnalyses();
+    } catch (err) {
+      console.error(err);
+      showMessage("Gabim gjatë fshirjes së analizës.", "error");
+    }
+  };
+
+  const handleOpenPDF = (analysis) => {
+    window.open(`${BACKEND_URL}${analysis.pdf_url}`, "_blank");
+  };
+
+  const handleCancelEdit = () => {
+    resetForm();
   };
 
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
-          <label htmlFor="analysisType" className="form-label">
-            {editingId ? "Përditëso Analizën" : "Lloji i Analizës"}
+          <label className="form-label">
+            {editingId ? "Përditëso Analizë" : "Lloji i Analizës"}
           </label>
           <input
             type="text"
-            id="analysisType"
-            placeholder="Shkruaj llojin e analizës"
             value={analysisType}
             onChange={(e) => setAnalysisType(e.target.value)}
+            placeholder="P.sh: Analizë gjaku"
             className="form-input"
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="fileUpload" className="form-label">Ngarko PDF</label>
+          <label className="form-label">
+            PDF Dokument {editingId && <span className="optional">(Opsionale)</span>}
+          </label>
           <div className="file-upload-area">
             <label htmlFor="fileUpload" className="file-upload-label">
               <div className="file-upload-content">
-                <div className="file-icon"><FileIcon /></div>
+                <div className="file-icon">
+                  <PDFIcon />
+                </div>
                 <div className="file-info">
                   {file ? (
                     <>
@@ -184,15 +188,15 @@ const AnalysisResultForm = ({ patientId }) => {
               <input
                 type="file"
                 id="fileUpload"
+                accept="application/pdf"
                 onChange={(e) => setFile(e.target.files[0])}
-                accept=".pdf,application/pdf"
                 className="file-input"
               />
             </label>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+        <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
           {editingId && (
             <button
               type="button"
@@ -221,11 +225,12 @@ const AnalysisResultForm = ({ patientId }) => {
               Anulo
             </button>
           )}
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="btn-submit"
             disabled={submitting}
-            style={{ 
+            style={{
               flex: editingId ? 2 : 1,
               display: 'flex',
               alignItems: 'center',
@@ -243,9 +248,9 @@ const AnalysisResultForm = ({ patientId }) => {
                 animation: 'spin 1s linear infinite'
               }}></div>
             ) : editingId ? (
-              'Përditëso Analizën'
+              'Përditëso Analizë'
             ) : (
-              'Ngarko Analizën'
+              'Shto Analizë'
             )}
           </button>
         </div>
@@ -253,32 +258,33 @@ const AnalysisResultForm = ({ patientId }) => {
 
       {message && (
         <div className={`message ${messageType}`}>
-          <span className="message-icon">{messageType === "success" ? "✓" : "!"}</span>
+          <span className="message-icon">
+            {messageType === "success" ? "✓" : "!"}
+          </span>
           {message}
         </div>
       )}
 
       <div className="existing-items">
         <div className="section-header">
-          <h4>Rezultatet e Analizave</h4>
-          <span className="count-badge">{results.length}</span>
+          <h4>Analizat ekzistuese</h4>
+          <span className="count-badge">{analyses.length}</span>
         </div>
 
-        {results.length === 0 ? (
+        {analyses.length === 0 ? (
           <div className="empty-state">
             <span className="empty-state-icon">🧪</span>
-            <p>Nuk ka analiza të ngarkuara për këtë pacient.</p>
+            <p>Nuk ka analiza për këtë pacient.</p>
           </div>
         ) : (
           <div className="items-list">
-            {results.map((r) => {
-              const created = new Date(r.uploaded_at || r.created_at);
-              const pdfLink = r.pdf_url;
-              const isEditing = editingId === r.id;
+            {analyses.map((a) => {
+              const isEditing = editingId === a.id;
+              const hasPDF = a.pdf_url;
 
               return (
-                <div 
-                  key={r.id} 
+                <div
+                  key={a.id}
                   className={`item-card ${isEditing ? 'editing' : ''}`}
                   style={{
                     borderLeft: isEditing ? '3px solid #10b981' : undefined,
@@ -286,23 +292,12 @@ const AnalysisResultForm = ({ patientId }) => {
                   }}
                 >
                   <div className="item-content">
-                    <p className="item-text">{r.analysis_type}</p>
+                    <p className="item-text">{a.analysis_type}</p>
+
                     <div className="item-meta">
-                      <span className="date" style={{
-                        fontSize: '0.8rem',
-                        color: '#6b7280'
-                      }}>
-                        Krijuar: {created.toLocaleDateString("sq-AL", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      {pdfLink && (
+                      {hasPDF && (
                         <button
-                          onClick={() => handleOpenPDF(pdfLink)}
+                          onClick={() => handleOpenPDF(a)}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -330,18 +325,33 @@ const AnalysisResultForm = ({ patientId }) => {
                           Shiko PDF
                         </button>
                       )}
+
+                      <span className="date" style={{
+                        fontSize: '0.8rem',
+                        color: '#6b7280'
+                      }}>
+                        {new Date(a.createdAt).toLocaleDateString("sq-AL", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
                     </div>
 
-                    <div className="item-actions" style={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      gap: '0.5rem',
-                      marginTop: '0.75rem',
-                      paddingTop: '0.75rem',
-                      borderTop: '1px solid #f3f4f6'
-                    }}>
-                      <button 
-                        onClick={() => handleEdit(r)}
+                    <div
+                      className="item-actions"
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: '0.5rem',
+                        marginTop: '0.75rem',
+                        paddingTop: '0.75rem',
+                        borderTop: '1px solid #f3f4f6'
+                      }}
+                    >
+                      <button
+                        onClick={() => handleEdit(a)}
                         style={{
                           padding: '0.375rem 0.75rem',
                           backgroundColor: 'transparent',
@@ -368,8 +378,8 @@ const AnalysisResultForm = ({ patientId }) => {
                         <EditIcon />
                         Edit
                       </button>
-                      <button 
-                        onClick={() => handleDelete(r.id)}
+                      <button
+                        onClick={() => handleDelete(a.id)}
                         style={{
                           padding: '0.375rem 0.75rem',
                           backgroundColor: 'transparent',

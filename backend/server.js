@@ -4,6 +4,7 @@ const cors = require("cors");
 const http = require("http");
 const { Server } = require("socket.io");
 const cron = require("node-cron");
+const path = require("path");
 
 const app = express();
 
@@ -15,7 +16,11 @@ app.use(
 );
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "src", "infrastructure", "uploads"))
+);
 
 const authRoutes = require("./src/presentation/routes/authRoutes");
 const appointmentRoutes = require("./src/presentation/routes/appointmentRoutes");
@@ -26,7 +31,6 @@ const activityRoutes = require('./src/presentation/routes/activityRoutes');
 const dietRoutes = require('./src/presentation/routes/dietRoutes');
 const adminUsersRoutes = require("./src/presentation/routes/adminUsersRoutes");
 
-
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
 app.use("/api/analysis", analysisResultRoutes);
@@ -35,7 +39,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/diets", dietRoutes);
 app.use("/api/admin/users", adminUsersRoutes);
-
 
 const sequelize = require("./src/infrastructure/config/db");
 
@@ -47,16 +50,25 @@ const Diet = require("./src/domain/models/Diet");
 const UserHealthProfile = require("./src/domain/models/UserHealthProfile");
 const Message = require("./src/domain/models/Message");
 
-AppointmentRequest.hasMany(AnalysisResult, { foreignKey: 'request_id' });
+AppointmentRequest.hasMany(AnalysisResult, { foreignKey: 'request_id', onDelete: 'CASCADE' });
 AnalysisResult.belongsTo(AppointmentRequest, { foreignKey: 'request_id' });
+
+AnalysisResult.hasMany(Activity, { foreignKey: 'analysis_id', onDelete: 'CASCADE' });
+Activity.belongsTo(AnalysisResult, { foreignKey: 'analysis_id' });
+
+AnalysisResult.hasMany(Diet, { foreignKey: 'analysis_id', onDelete: 'CASCADE' });
+Diet.belongsTo(AnalysisResult, { foreignKey: 'analysis_id' });
+
+User.hasMany(Activity, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Activity.belongsTo(User, { foreignKey: 'user_id' });
+
+User.hasMany(Diet, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Diet.belongsTo(User, { foreignKey: 'user_id' });
 
 cron.schedule("*/5 * * * *", async () => {
   try {
     const now = new Date();
-
-    const scheduledAppointments = await AppointmentRequest.findAll({
-      where: { status: "scheduled" },
-    });
+    const scheduledAppointments = await AppointmentRequest.findAll({ where: { status: "scheduled" } });
 
     for (const ap of scheduledAppointments) {
       if (new Date(ap.scheduled_date) < now) {
@@ -72,10 +84,7 @@ cron.schedule("*/5 * * * *", async () => {
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
 });
 
 io.on("connection", (socket) => {
@@ -84,11 +93,7 @@ io.on("connection", (socket) => {
   socket.on("register", ({ userId, role }) => {
     socket.join(String(userId));
     socket.data = { userId, role };
-
-    if (role === "clinic") {
-      socket.join("clinic");
-    }
-
+    if (role === "clinic") socket.join("clinic");
     console.log(`Registered -> userId=${userId} | role=${role}`);
   });
 
@@ -96,16 +101,10 @@ io.on("connection", (socket) => {
     const senderId = socket.data.userId;
     const senderRole = socket.data.role;
 
-    if (senderRole === "user" && to !== "clinic") {
-      console.log(`User ${senderId} tried to message non-clinic.`);
-      return;
-    }
+    if (senderRole === "user" && to !== "clinic") return;
 
-    if (to === "clinic") {
-      io.to("clinic").emit("receiveMessage", { from: senderId, message });
-    } else {
-      io.to(String(to)).emit("receiveMessage", { from: senderId, message });
-    }
+    if (to === "clinic") io.to("clinic").emit("receiveMessage", { from: senderId, message });
+    else io.to(String(to)).emit("receiveMessage", { from: senderId, message });
 
     try {
       await Message.create({
@@ -125,15 +124,11 @@ io.on("connection", (socket) => {
 
 const PORT = process.env.PORT || 5000;
 
-sequelize
-  .sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log("All tables synced!");
     httpServer.listen(PORT, () => {
       console.log(`[BACKEND] Server running on http://localhost:${PORT}`);
     });
   })
-
-  .catch((err) => {
-    console.error("Sync error:", err);
-  });
+  .catch((err) => console.error("Sync error:", err));

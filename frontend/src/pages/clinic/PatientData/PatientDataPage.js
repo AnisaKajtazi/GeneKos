@@ -108,7 +108,7 @@ const PatientDataPage = () => {
     <div className="patient-data-container">
       <header className="page-header">
         <h1 className="page-title">Shto të dhënat e pacientit</h1>
-        <p className="page-subtitle">Menaxhoni aktivitetet, dietën dhe analizat e pacientëve</p>
+        <p className="page-subtitle">Menaxhoni analizat, aktivitetet dhe dietën e pacientëve</p>
       </header>
 
       <div className="search-section">
@@ -202,7 +202,23 @@ const PatientDataPage = () => {
           </div>
 
           <div className="forms-single-column">
-            
+                        <div className="form-card-wide">
+              <div className="form-card-header">
+                <div className="form-card-title">
+                  <div className="form-icon minimal-icon">
+                    <AnalysisCardIcon />
+                  </div>
+                  <span>Analizat</span>
+                </div>
+                <p className="form-card-description">
+                  Vendosni rezultatet e analizave mjekësore
+                </p>
+              </div>
+              <div className="form-card-body">
+                <AnalysisResultForm patientId={selectedPatient.id} />
+              </div>
+            </div>
+
             <div className="form-card-wide">
               <div className="form-card-header">
                 <div className="form-card-title">
@@ -237,22 +253,7 @@ const PatientDataPage = () => {
               </div>
             </div>
 
-            <div className="form-card-wide">
-              <div className="form-card-header">
-                <div className="form-card-title">
-                  <div className="form-icon minimal-icon">
-                    <AnalysisCardIcon />
-                  </div>
-                  <span>Analizat</span>
-                </div>
-                <p className="form-card-description">
-                  Vendosni rezultatet e analizave mjekësore
-                </p>
-              </div>
-              <div className="form-card-body">
-                <AnalysisResultForm patientId={selectedPatient.id} />
-              </div>
-            </div>
+
 
           </div>
 
