@@ -13,6 +13,8 @@ import ChatPage from './pages/chat/ChatPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsersPage from './pages/admin/users/AdminUsersPage';
 import ClinicUsersPage from './pages/clinic/users/ClinicUsersPage';
+import AdminDietsPage from './pages/admin/diets/AdminDietsPage';
+
 
 const ChatWrapper = () => {
   const { user } = useContext(AuthContext);
@@ -39,27 +41,60 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<AdminDashboard />} />
+              <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
 
-              <Route path="users" element={<AdminUsersPage />} />
-            </Route>
+              <Route
+                path="admin"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
 
+              <Route
+                path="users"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminUsersPage />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute allowedRoles={['user', 'clinic']}>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            >
+              <Route
+                path="activities"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminActivitiesPage />
+                  </ProtectedRoute>
+                }
+              />
+
+                <Route
+                  path="diets"
+                  element={
+                    <ProtectedRoute allowedRoles={['admin']}>
+                      <AdminDietsPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+              <Route
+                path="audit-logs"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminAuditLogsPage />
+                  </ProtectedRoute>
+                }
+              />
+
               <Route path="client/appointments" element={<UserAppointmentsPage />} />
+
               <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
                 <Route path="clinic/patients" element={<ClinicUsersPage />} />
               <Route path="clinic/PatientData" element={<PatientDataPage />} />
               <Route path="chat" element={<ChatWrapper />} />
 
-              <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
             </Route>
 
           </Routes>

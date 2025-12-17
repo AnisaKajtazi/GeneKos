@@ -71,6 +71,7 @@ const Sidebar = () => {
             <Link to="/dashboard/diets" className={linkClass("/dashboard/diets")}>Dietat</Link>
             <Link to="/dashboard/activities" className={linkClass("/dashboard/activities")}>Aktivitetet</Link>
             <Link to="/dashboard/audit-logs" className={linkClass("/dashboard/audit-logs")}>Audit Logs</Link>
+
           </>
         );
       default:
