@@ -2,18 +2,24 @@ import React, { useContext } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext';
+
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
+
 import UserAppointmentsPage from './pages/client/UserAppointmentsPage';
 import ClinicAppointmentsPage from './pages/clinic/ClinicAppointmentsPage';
 import PatientDataPage from './pages/clinic/PatientData/PatientDataPage';
 import ChatPage from './pages/chat/ChatPage';
+
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminUsersPage from './pages/admin/users/AdminUsersPage';
-import ClinicUsersPage from './pages/clinic/users/ClinicUsersPage';
+import AdminActivitiesPage from './pages/admin/activities/AdminActivitiesPage';
+import AdminAuditLogsPage from './pages/admin/auditlogs/AdminAuditLogsPage';
 import AdminDietsPage from './pages/admin/diets/AdminDietsPage';
+
+import ClinicUsersPage from './pages/clinic/users/ClinicUsersPage';
 
 
 const ChatWrapper = () => {
