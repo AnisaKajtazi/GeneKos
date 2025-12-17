@@ -2,6 +2,7 @@ const AppointmentRequest = require("../../domain/models/AppointmentRequest");
 const { slots, isValidSlot } = require("../utils/appointmentSlots");
 const { Op } = require("sequelize");
 
+
 exports.createAppointment = async (req, res) => {
   try {
     const { user_id, scheduled_date, note } = req.body;
@@ -15,7 +16,6 @@ exports.createAppointment = async (req, res) => {
     if (chosen < today) {
       return res.status(400).json({ message: "Past dates are not allowed" });
     }
- 
 
     const time = scheduled_date.slice(11, 16);
 
@@ -31,7 +31,6 @@ exports.createAppointment = async (req, res) => {
 
     if (exists)
       return res.status(409).json({ message: "This appointment slot is already taken." });
-
 
     const appointment = await AppointmentRequest.create({
       user_id,
@@ -66,7 +65,6 @@ exports.getAvailableSlots = async (req, res) => {
     });
 
     const takenSlots = appointments.map(a => a.scheduled_date.slice(11, 16));
-
     const availableSlots = slots.filter(slot => !takenSlots.includes(slot));
 
     return res.json({ date, available_slots: availableSlots });
@@ -109,6 +107,7 @@ exports.getPendingAppointments = async (req, res) => {
   }
 };
 
+
 exports.approveAppointment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,6 +139,20 @@ exports.cancelAppointment = async (req, res) => {
 
     return res.json({ message: "Appointment cancelled", appointment });
 
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+exports.getAllAppointmentRequests = async (req, res) => {
+  try {
+    const requests = await AppointmentRequest.findAll({
+      attributes: ['id', 'scheduled_date', 'status'],
+      order: [['scheduled_date', 'ASC']]
+    });
+    return res.json(requests);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });

@@ -30,6 +30,10 @@ const userRoutes = require("./src/presentation/routes/usersRoutes");
 const activityRoutes = require('./src/presentation/routes/activityRoutes');
 const dietRoutes = require('./src/presentation/routes/dietRoutes');
 const adminUsersRoutes = require("./src/presentation/routes/adminUsersRoutes");
+const adminActivitiesRoutes = require('./src/presentation/routes/adminActivitiesRoutes');
+const auditLogRoutes = require('./src/presentation/routes/auditLogRoutes');
+const adminAppointmentRoutes = require('./src/presentation/routes/adminAppointmentRoutes');
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/appointments", appointmentRoutes);
@@ -39,6 +43,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/activities", activityRoutes);
 app.use("/api/diets", dietRoutes);
 app.use("/api/admin/users", adminUsersRoutes);
+app.use('/api/admin/activities', adminActivitiesRoutes);
+app.use('/api/admin/audit-logs', auditLogRoutes);
+app.use('/api/admin/appointments', adminAppointmentRoutes);
+
 
 const sequelize = require("./src/infrastructure/config/db");
 
@@ -49,6 +57,18 @@ const AppointmentRequest = require("./src/domain/models/AppointmentRequest");
 const Diet = require("./src/domain/models/Diet");
 const UserHealthProfile = require("./src/domain/models/UserHealthProfile");
 const Message = require("./src/domain/models/Message");
+
+Activity.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Activity, { foreignKey: 'user_id' });
+
+Activity.belongsTo(AppointmentRequest, { foreignKey: 'request_id' });
+AppointmentRequest.hasMany(Activity, { foreignKey: 'request_id' });
+
+Activity.belongsTo(User, { foreignKey: 'user_id' });
+User.hasMany(Activity, { foreignKey: 'user_id' });
+
+Activity.belongsTo(AppointmentRequest, { foreignKey: 'request_id' });
+AppointmentRequest.hasMany(Activity, { foreignKey: 'request_id' });
 
 AppointmentRequest.hasMany(AnalysisResult, { foreignKey: 'request_id', onDelete: 'CASCADE' });
 AnalysisResult.belongsTo(AppointmentRequest, { foreignKey: 'request_id' });
@@ -68,7 +88,9 @@ Diet.belongsTo(User, { foreignKey: 'user_id' });
 cron.schedule("*/5 * * * *", async () => {
   try {
     const now = new Date();
-    const scheduledAppointments = await AppointmentRequest.findAll({ where: { status: "scheduled" } });
+    const scheduledAppointments = await AppointmentRequest.findAll({
+      where: { status: "scheduled" },
+    });
 
     for (const ap of scheduledAppointments) {
       if (new Date(ap.scheduled_date) < now) {
@@ -131,4 +153,6 @@ sequelize.sync()
       console.log(`[BACKEND] Server running on http://localhost:${PORT}`);
     });
   })
-  .catch((err) => console.error("Sync error:", err));
+  .catch((err) => {
+    console.error("Sync error:", err);
+  });
