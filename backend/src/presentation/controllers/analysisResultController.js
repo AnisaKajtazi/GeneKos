@@ -11,6 +11,15 @@ const uploadAnalysisPDF = async (req, res) => {
 
     const { request_id, analysis_type } = req.body;
 
+    if (!request_id) {
+      return res.status(400).json({ message: "Appointment must be selected" });
+    }
+
+    const appointment = await AppointmentRequest.findByPk(request_id);
+    if (!appointment) {
+      return res.status(404).json({ message: "Selected appointment does not exist" });
+    }
+
     if (!analysis_type) {
       return res.status(400).json({ message: "Analysis type is required" });
     }
@@ -38,7 +47,7 @@ const getAnalysisResultsByUser = async (req, res) => {
       include: [
         {
           model: AppointmentRequest,
-          where: { user_id: userId },
+          where: { user_id: userId, status: "completed" }, 
           attributes: ["id", "scheduled_date", "status"],
         },
       ],
@@ -52,11 +61,10 @@ const getAnalysisResultsByUser = async (req, res) => {
   }
 };
 
-
 const updateAnalysisPDF = async (req, res) => {
   try {
     const { id } = req.params;
-    const { analysis_type } = req.body;
+    const { analysis_type, request_id } = req.body; 
 
     const analysis = await AnalysisResult.findByPk(id);
     if (!analysis) {
@@ -67,16 +75,13 @@ const updateAnalysisPDF = async (req, res) => {
       analysis.analysis_type = analysis_type;
     }
 
-    if (req.file) {
-      const oldPath = path.join(
-        __dirname,
-        "../../../",
-        analysis.pdf_url
-      );
+    if (request_id) {
+      analysis.request_id = request_id;
+    }
 
-      if (fs.existsSync(oldPath)) {
-        fs.unlinkSync(oldPath);
-      }
+    if (req.file) {
+      const oldPath = path.join(__dirname, "../../../", analysis.pdf_url);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
 
       analysis.pdf_url = `/uploads/analyses/${req.file.filename}`;
     }
@@ -89,6 +94,7 @@ const updateAnalysisPDF = async (req, res) => {
   }
 };
 
+
 const deleteAnalysisResult = async (req, res) => {
   try {
     const { id } = req.params;
@@ -99,11 +105,10 @@ const deleteAnalysisResult = async (req, res) => {
     }
 
     const relativePath = analysis.pdf_url.replace(/^\/+/, "");
-    const filePath = require('path').join(process.cwd(), relativePath);
-    if (require('fs').existsSync(filePath)) fs.unlinkSync(filePath);
+    const filePath = path.join(process.cwd(), relativePath);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 
     await analysis.destroy();
-
     res.json({ message: "Analysis deleted successfully" });
   } catch (err) {
     console.error("DELETE ERROR:", err);

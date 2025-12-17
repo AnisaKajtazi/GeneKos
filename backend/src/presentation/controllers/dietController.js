@@ -3,7 +3,6 @@ const AppointmentRequest = require('../../domain/models/AppointmentRequest');
 const User = require('../../domain/models/User');
 const AuditLog = require('../../domain/models/AuditLog');
 
-// ------------------ Audit Log ------------------
 const createAuditLog = async ({ userId, username, role, action, entity, entityId, description }) => {
   try {
     await AuditLog.create({
@@ -20,7 +19,6 @@ const createAuditLog = async ({ userId, username, role, action, entity, entityId
   }
 };
 
-// ------------------ CREATE DIET ------------------
 exports.createDiet = async (req, res) => {
   try {
     const { user_id, request_id, diet_plan } = req.body;
@@ -29,7 +27,6 @@ exports.createDiet = async (req, res) => {
       return res.status(400).json({ message: "User ID and diet plan are required" });
     }
 
-    // optional check për request_id
     if (request_id) {
       const appointment = await AppointmentRequest.findByPk(request_id);
       if (!appointment) {
@@ -62,7 +59,6 @@ exports.createDiet = async (req, res) => {
   }
 };
 
-// ------------------ GET USER DIETS ------------------
 exports.getUserDiets = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -79,7 +75,6 @@ exports.getUserDiets = async (req, res) => {
   }
 };
 
-// ------------------ GET DIET BY ID ------------------
 exports.getDietById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -96,7 +91,7 @@ exports.getDietById = async (req, res) => {
   }
 };
 
-// ------------------ GET ALL DIETS (ADMIN) ------------------
+
 exports.getAllDiets = async (req, res) => {
   try {
     const diets = await Diet.findAll({
@@ -104,12 +99,12 @@ exports.getAllDiets = async (req, res) => {
         {
           model: User,
           attributes: ['id', 'first_name', 'last_name'],
-          required: false // LEFT JOIN, nuk thyhet query nëse user mungon
+          required: false 
         },
         {
           model: AppointmentRequest,
           attributes: ['id', 'scheduled_date', 'status'],
-          required: false // LEFT JOIN
+          required: false 
         }
       ],
       order: [['created_at', 'DESC']]
@@ -122,7 +117,7 @@ exports.getAllDiets = async (req, res) => {
   }
 };
 
-// ------------------ UPDATE DIET ------------------
+
 exports.updateDiet = async (req, res) => {
   try {
     const { id } = req.params;
@@ -145,7 +140,7 @@ exports.updateDiet = async (req, res) => {
   }
 };
 
-// ------------------ DELETE DIET ------------------
+
 exports.deleteDiet = async (req, res) => {
   try {
     const { id } = req.params;

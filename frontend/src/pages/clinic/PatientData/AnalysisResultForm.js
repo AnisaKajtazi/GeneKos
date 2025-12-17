@@ -5,6 +5,8 @@ import "../../../styles/formstyles.css";
 const BACKEND_URL = "http://localhost:5000";
 
 const AnalysisResultForm = ({ patientId }) => {
+  const [appointments, setAppointments] = useState([]);
+  const [selectedAppointment, setSelectedAppointment] = useState("");
   const [analysisType, setAnalysisType] = useState("");
   const [file, setFile] = useState(null);
   const [analyses, setAnalyses] = useState([]);
@@ -13,31 +15,21 @@ const AnalysisResultForm = ({ patientId }) => {
   const [messageType, setMessageType] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const EditIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-    </svg>
-  );
+useEffect(() => {
+  const fetchAppointments = async () => {
+    try {
+      const res = await api.get(`/appointments/user/${patientId}`);
+      const completedAppointments = (res.data.appointments || []).filter(
+        (a) => a.status.toLowerCase() === "completed"
+      );
+      setAppointments(completedAppointments);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  if (patientId) fetchAppointments();
+}, [patientId]);
 
-  const DeleteIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M3 6h18" />
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-      <line x1="10" y1="11" x2="10" y2="17" />
-      <line x1="14" y1="11" x2="14" y2="17" />
-    </svg>
-  );
-
-  const PDFIcon = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-      <polyline points="14 2 14 8 20 8" />
-      <path d="M10 11H8v5h2a2 2 0 1 0 0-4z" />
-      <path d="M14 11h2a2 2 0 0 1 0 4h-2v-4z" />
-    </svg>
-  );
 
   const fetchAnalyses = async () => {
     try {
@@ -66,31 +58,22 @@ const AnalysisResultForm = ({ patientId }) => {
     setAnalysisType("");
     setFile(null);
     setEditingId(null);
+    setSelectedAppointment("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!analysisType.trim()) {
-      showMessage("Shkruani llojin e analizës.", "error");
-      return;
-    }
-
-    if (!editingId && !file) {
-      showMessage("Ju lutem ngarkoni një PDF.", "error");
-      return;
-    }
+    if (!analysisType.trim()) return showMessage("Shkruani llojin e analizës.", "error");
+    if (!selectedAppointment) return showMessage("Zgjidhni një takim.", "error");
+    if (!editingId && !file) return showMessage("Ju lutem ngarkoni një PDF.", "error");
 
     setSubmitting(true);
-
     try {
       const formData = new FormData();
       formData.append("analysis_type", analysisType);
-      formData.append("request_id", patientId);
-
-      if (file) {
-        formData.append("pdf", file);
-      }
+      formData.append("request_id", selectedAppointment);
+      if (file) formData.append("pdf", file);
 
       if (editingId) {
         await api.put(`/analysis/${editingId}`, formData, {
@@ -108,10 +91,7 @@ const AnalysisResultForm = ({ patientId }) => {
       fetchAnalyses();
     } catch (err) {
       console.error(err);
-      showMessage(
-        err.response?.data?.message || "Gabim gjatë ruajtjes së analizës.",
-        "error"
-      );
+      showMessage(err.response?.data?.message || "Gabim gjatë ruajtjes së analizës.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -121,11 +101,11 @@ const AnalysisResultForm = ({ patientId }) => {
     setEditingId(analysis.id);
     setAnalysisType(analysis.analysis_type);
     setFile(null);
+    setSelectedAppointment(analysis.request_id || "");
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("A jeni të sigurt që dëshironi ta fshini analizën?"))
-      return;
+    if (!window.confirm("A jeni të sigurt që dëshironi ta fshini analizën?")) return;
 
     try {
       await api.delete(`/analysis/${id}`);
@@ -141,13 +121,53 @@ const AnalysisResultForm = ({ patientId }) => {
     window.open(`${BACKEND_URL}${analysis.pdf_url}`, "_blank");
   };
 
-  const handleCancelEdit = () => {
-    resetForm();
-  };
+  const handleCancelEdit = () => resetForm();
+
+  const EditIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+    </svg>
+  );
+
+  const DeleteIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
+    </svg>
+  );
+
+  const PDFIcon = () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <path d="M10 11H8v5h2a2 2 0 1 0 0-4z" />
+      <path d="M14 11h2a2 2 0 0 1 0 4h-2v-4z" />
+    </svg>
+  );
 
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit} className="form">
+        <div className="form-group">
+          <label className="form-label">Zgjidh Takimin</label>
+          <select
+            value={selectedAppointment}
+            onChange={(e) => setSelectedAppointment(e.target.value)}
+            className="form-input"
+          >
+            <option value="">Zgjidh takimin</option>
+            {appointments.map((a) => (
+              <option key={a.id} value={a.id}>
+                {new Date(a.scheduled_date).toLocaleString("sq-AL")}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="form-group">
           <label className="form-label">
             {editingId ? "Përditëso Analizë" : "Lloji i Analizës"}
@@ -168,9 +188,7 @@ const AnalysisResultForm = ({ patientId }) => {
           <div className="file-upload-area">
             <label htmlFor="fileUpload" className="file-upload-label">
               <div className="file-upload-content">
-                <div className="file-icon">
-                  <PDFIcon />
-                </div>
+                <div className="file-icon"><PDFIcon /></div>
                 <div className="file-info">
                   {file ? (
                     <>
@@ -197,73 +215,14 @@ const AnalysisResultForm = ({ patientId }) => {
         </div>
 
         <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-          {editingId && (
-            <button
-              type="button"
-              onClick={handleCancelEdit}
-              style={{
-                flex: 1,
-                padding: '0.75rem 1rem',
-                backgroundColor: 'transparent',
-                color: '#6b7280',
-                border: '1px solid #e5e7eb',
-                borderRadius: '0.5rem',
-                fontWeight: '600',
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f9fafb';
-                e.currentTarget.style.borderColor = '#d1d5db';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = '#e5e7eb';
-              }}
-            >
-              Anulo
-            </button>
-          )}
-
-          <button
-            type="submit"
-            className="btn-submit"
-            disabled={submitting}
-            style={{
-              flex: editingId ? 2 : 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem'
-            }}
-          >
-            {submitting ? (
-              <div style={{
-                width: '16px',
-                height: '16px',
-                border: '2px solid rgba(255, 255, 255, 0.3)',
-                borderTopColor: 'white',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite'
-              }}></div>
-            ) : editingId ? (
-              'Përditëso Analizë'
-            ) : (
-              'Shto Analizë'
-            )}
+          {editingId && <button type="button" onClick={handleCancelEdit} className="btn-cancel">Anulo</button>}
+          <button type="submit" className="btn-submit" disabled={submitting}>
+            {submitting ? "Duke u ngarkuar..." : editingId ? "Përditëso Analizë" : "Shto Analizë"}
           </button>
         </div>
       </form>
 
-      {message && (
-        <div className={`message ${messageType}`}>
-          <span className="message-icon">
-            {messageType === "success" ? "✓" : "!"}
-          </span>
-          {message}
-        </div>
-      )}
+      {message && <div className={`message ${messageType}`}>{message}</div>}
 
       <div className="existing-items">
         <div className="section-header">
@@ -283,53 +242,41 @@ const AnalysisResultForm = ({ patientId }) => {
               const hasPDF = a.pdf_url;
 
               return (
-                <div
-                  key={a.id}
-                  className={`item-card ${isEditing ? 'editing' : ''}`}
-                  style={{
-                    borderLeft: isEditing ? '3px solid #10b981' : undefined,
-                    backgroundColor: isEditing ? 'rgba(16, 185, 129, 0.05)' : undefined
-                  }}
-                >
+                <div key={a.id} className={`item-card ${isEditing ? "editing" : ""}`}>
                   <div className="item-content">
                     <p className="item-text">{a.analysis_type}</p>
-
                     <div className="item-meta">
                       {hasPDF && (
-                        <button
-                          onClick={() => handleOpenPDF(a)}
+                        <button 
+                          onClick={() => handleOpenPDF(a)} 
+                          className="btn-pdf"
                           style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '0.8rem',
-                            color: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            border: '1px solid rgba(59, 130, 246, 0.3)',
-                            borderRadius: '0.25rem',
-                            padding: '0.25rem 0.5rem',
-                            cursor: 'pointer',
-                            fontWeight: '500',
-                            transition: 'all 0.2s ease'
+                            padding: "0.25rem 0.5rem",
+                            backgroundColor: "rgba(16, 185, 129, 0.1)",
+                            color: "#065f46",
+                            border: "none",
+                            borderRadius: "0.25rem",
+                            fontSize: "0.75rem",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.375rem",
+                            transition: "all 0.2s ease"
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
-                            e.currentTarget.style.transform = 'translateY(-1px)';
+                            e.currentTarget.style.backgroundColor = "rgba(16, 185, 129, 0.2)";
+                            e.currentTarget.style.transform = "translateY(-1px)";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.backgroundColor = "rgba(16, 185, 129, 0.1)";
+                            e.currentTarget.style.transform = "translateY(0)";
                           }}
                         >
-                          <PDFIcon />
-                          Shiko PDF
+                          <PDFIcon /> Shiko PDF
                         </button>
                       )}
-
-                      <span className="date" style={{
-                        fontSize: '0.8rem',
-                        color: '#6b7280'
-                      }}>
+                      <span className="date">
                         {new Date(a.createdAt).toLocaleDateString("sq-AL", {
                           day: "numeric",
                           month: "short",
@@ -338,20 +285,17 @@ const AnalysisResultForm = ({ patientId }) => {
                         })}
                       </span>
                     </div>
-
-                    <div
-                      className="item-actions"
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: '0.5rem',
-                        marginTop: '0.75rem',
-                        paddingTop: '0.75rem',
-                        borderTop: '1px solid #f3f4f6'
-                      }}
-                    >
-                      <button
-                        onClick={() => handleEdit(a)}
+                    <div className="item-actions" style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      gap: '0.5rem',
+                      marginTop: '0.75rem',
+                      paddingTop: '0.75rem',
+                      borderTop: '1px solid #f3f4f6'
+                    }}>
+                      <button 
+                        onClick={() => handleEdit(a)} 
+                        className="btn-edit"
                         style={{
                           padding: '0.375rem 0.75rem',
                           backgroundColor: 'transparent',
@@ -378,8 +322,9 @@ const AnalysisResultForm = ({ patientId }) => {
                         <EditIcon />
                         Edit
                       </button>
-                      <button
-                        onClick={() => handleDelete(a.id)}
+                      <button 
+                        onClick={() => handleDelete(a.id)} 
+                        className="btn-delete"
                         style={{
                           padding: '0.375rem 0.75rem',
                           backgroundColor: 'transparent',
@@ -414,35 +359,6 @@ const AnalysisResultForm = ({ patientId }) => {
           </div>
         )}
       </div>
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-        
-        .item-card.editing {
-          animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-          70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-        
-        @media (max-width: 768px) {
-          .item-meta {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-          }
-          
-          .item-actions {
-            flex-wrap: wrap;
-            justify-content: center !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };
