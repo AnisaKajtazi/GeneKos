@@ -71,11 +71,13 @@ const PatientDataPage = () => {
       
       try {
         const response = await api.get(`/users?search=${searchTerm}`);
-        if (response.data.length === 0) {
+        const activePatients = response.data.filter(patient => patient.is_active !== false);
+
+        if (activePatients.length === 0) {
           setPatients([]);
           setError("Asnjë pacient i gjetur");
         } else {
-          setPatients(response.data);
+          setPatients(activePatients);
           setError("");
         }
       } catch (err) {
@@ -202,7 +204,7 @@ const PatientDataPage = () => {
           </div>
 
           <div className="forms-single-column">
-                        <div className="form-card-wide">
+            <div className="form-card-wide">
               <div className="form-card-header">
                 <div className="form-card-title">
                   <div className="form-icon minimal-icon">
@@ -252,9 +254,6 @@ const PatientDataPage = () => {
                 <DietForm patientId={selectedPatient.id} />
               </div>
             </div>
-
-
-
           </div>
 
           <div className="action-buttons">
@@ -268,7 +267,6 @@ const PatientDataPage = () => {
         </div>
       )}
 
-
       {!selectedPatient && !error && !loading && searchTerm === "" && (
         <div className="empty-state">
           <div className="empty-state-icon minimal-icon">
@@ -280,7 +278,6 @@ const PatientDataPage = () => {
           </p>
         </div>
       )}
-
 
       {!selectedPatient && !error && !loading && searchTerm !== "" && patients.length === 0 && (
         <div className="empty-state">

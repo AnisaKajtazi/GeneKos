@@ -3,7 +3,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import '../../styles/sidebar.css';
 
-const Sidebar = ({ children }) => {
+const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,35 +26,51 @@ const Sidebar = ({ children }) => {
             <Link to="/dashboard/client/appointments" className={linkClass("/dashboard/client/appointments")}>
               Appointments
             </Link>
-            <Link to="/analyses" className={linkClass("/analyses")}>Analizat</Link>
-            <Link to="/diets" className={linkClass("/diets")}>Dietat</Link>
-            <Link to="/activities" className={linkClass("/activities")}>Aktivitetet</Link>
-            <Link to="/dashboard/chat" className={linkClass("/dashboard/chat")}>Chat</Link>
+            <Link to="/analyses" className={linkClass("/analyses")}>
+              Analizat
+            </Link>
+            <Link to="/diets" className={linkClass("/diets")}>
+              Dietat
+            </Link>
+            <Link to="/activities" className={linkClass("/activities")}>
+              Aktivitetet
+            </Link>
+            <Link to="/dashboard/chat" className={linkClass("/dashboard/chat")}>
+              Chat
+            </Link>
           </>
         );
+
+
       case 'clinic':
         return (
           <>
             <Link to="/dashboard/clinic/appointments" className={linkClass("/dashboard/clinic/appointments")}>
               Appointments
             </Link>
-            <Link to="/users" className={linkClass("/users")}>Pacientët</Link>
+            <Link
+              to="/dashboard/clinic/patients"
+              className={linkClass("/dashboard/clinic/patients")}
+            >
+              Pacientët
+            </Link>
             <Link to="/dashboard/clinic/PatientData" className={linkClass("/dashboard/clinic/PatientData")}>
               Shto të dhënat e pacientit
             </Link>
-            <Link to="/dashboard/chat" className={linkClass("/dashboard/chat")}>Chat</Link>
+            <Link to="/dashboard/chat" className={linkClass("/dashboard/chat")}>
+              Chat
+            </Link>
           </>
         );
+
       case 'admin':
         return (
           <>
             <Link to="/dashboard/users" className={linkClass("/dashboard/users")}>Pacientët</Link>
-            <Link to="/clinics" className={linkClass("/clinics")}>Klinikat</Link>
             <Link to="/analyses" className={linkClass("/analyses")}>Analizat</Link>
-            <Link to="/diets" className={linkClass("/diets")}>Dietat</Link>
-            <Link to="/activities" className={linkClass("/activities")}>Aktivitetet</Link>
-            <Link to="/auditlogs" className={linkClass("/auditlogs")}>Audit Logs</Link>
-            <Link to="/roles" className={linkClass("/roles")}>Roles & Permissions</Link>
+            <Link to="/dashboard/diets" className={linkClass("/dashboard/diets")}>Dietat</Link>
+            <Link to="/dashboard/activities" className={linkClass("/dashboard/activities")}>Aktivitetet</Link>
+            <Link to="/dashboard/audit-logs" className={linkClass("/dashboard/audit-logs")}>Audit Logs</Link>
           </>
         );
       default:
@@ -69,7 +85,9 @@ const Sidebar = ({ children }) => {
 
         {user && (
           <div className="user-role-indicator">
-            <span className="user-role-badge">{user.role}</span>
+            <span className="user-role-badge">
+              {user.role}
+            </span>
           </div>
         )}
 
@@ -83,11 +101,9 @@ const Sidebar = ({ children }) => {
       </aside>
 
       <main className="content">
-        {children}
       </main>
     </div>
   );
 };
 
 export default Sidebar;
-  

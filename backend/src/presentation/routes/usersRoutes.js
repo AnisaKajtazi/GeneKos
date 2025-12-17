@@ -13,24 +13,24 @@ router.get("/", authMiddleware, async (req, res) => {
     let users = [];
 
     if (req.user.role === "clinic") {
+      const whereClause = {
+        role: "user",
+        is_active: true,
+      };
+
       if (search) {
-        users = await User.findAll({
-          where: {
-            role: "user",
-            [Op.or]: [
-              where(fn("LOWER", col("first_name")), "LIKE", `%${search.toLowerCase()}%`),
-              where(fn("LOWER", col("last_name")), "LIKE", `%${search.toLowerCase()}%`),
-              where(fn("LOWER", col("username")), "LIKE", `%${search.toLowerCase()}%`)
-            ],
-          },
-          attributes: ["id", "first_name", "last_name", "role"],
-        });
-      } else {
-        users = await User.findAll({
-          where: { role: "user" },
-          attributes: ["id", "first_name", "last_name", "role"],
-        });
+        whereClause[Op.or] = [
+          where(fn("LOWER", col("first_name")), "LIKE", `%${search.toLowerCase()}%`),
+          where(fn("LOWER", col("last_name")), "LIKE", `%${search.toLowerCase()}%`),
+          where(fn("LOWER", col("username")), "LIKE", `%${search.toLowerCase()}%`)
+        ];
       }
+
+      users = await User.findAll({
+        where: whereClause,
+        attributes: ["id", "first_name", "last_name", "role"],
+      });
+
       console.log("Users fetched from DB:", users.map(u => u.dataValues));
     }
 

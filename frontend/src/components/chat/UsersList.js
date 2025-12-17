@@ -5,8 +5,9 @@ const UserList = ({ users, selectUser = () => {}, unreadMessages = [], currentUs
   const [searchTerm, setSearchTerm] = useState("");
 
   const hasUnread = (id) => unreadMessages.includes(id === "clinic" ? "clinic" : id);
+  const activeUsers = users.filter(user => user.is_active !== false);
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = activeUsers.filter(user => {
     if (!searchTerm) return true;
     const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
     return fullName.includes(searchTerm.toLowerCase());
@@ -147,7 +148,7 @@ const UserList = ({ users, selectUser = () => {}, unreadMessages = [], currentUs
           </div>
         ))}
 
-        {filteredUsers.length === 0 && currentUser?.role !== "user" && (
+        {filteredUsers.length === 0 && (
           <div className="no-users-found">
             <div className="no-users-icon">
               <UserIcon />
@@ -157,18 +158,6 @@ const UserList = ({ users, selectUser = () => {}, unreadMessages = [], currentUs
                 ? `Nuk u gjet asnjë kontakt me "${searchTerm}"` 
                 : 'Nuk ka kontakte të disponueshme'
               }
-            </p>
-          </div>
-        )}
-        
-
-        {filteredUsers.length === 0 && currentUser?.role === "user" && searchTerm && (
-          <div className="no-users-found">
-            <div className="no-users-icon">
-              <UserIcon />
-            </div>
-            <p className="no-users-text">
-              Nuk u gjet asnjë kontakt me "{searchTerm}"
             </p>
           </div>
         )}
