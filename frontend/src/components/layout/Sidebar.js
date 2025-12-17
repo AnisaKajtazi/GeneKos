@@ -49,12 +49,11 @@ const Sidebar = ({ children }) => {
         return (
           <>
             <Link to="/dashboard/users" className={linkClass("/dashboard/users")}>Pacientët</Link>
-            <Link to="/clinics" className={linkClass("/clinics")}>Klinikat</Link>
             <Link to="/analyses" className={linkClass("/analyses")}>Analizat</Link>
-            <Link to="/diets" className={linkClass("/diets")}>Dietat</Link>
-            <Link to="/activities" className={linkClass("/activities")}>Aktivitetet</Link>
-            <Link to="/auditlogs" className={linkClass("/auditlogs")}>Audit Logs</Link>
-            <Link to="/roles" className={linkClass("/roles")}>Roles & Permissions</Link>
+            <Link to="/dashboard/diets" className={linkClass("/dashboard/diets")}>Dietat</Link>
+            <Link to="/dashboard/activities" className={linkClass("/dashboard/activities")}>Aktivitetet</Link>
+            <Link to="/dashboard/audit-logs" className={linkClass("/dashboard/audit-logs")}>Audit Logs</Link>
+
           </>
         );
       default:

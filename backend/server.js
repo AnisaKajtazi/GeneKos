@@ -33,6 +33,8 @@ const adminUsersRoutes = require("./src/presentation/routes/adminUsersRoutes");
 const adminActivitiesRoutes = require('./src/presentation/routes/adminActivitiesRoutes');
 const auditLogRoutes = require('./src/presentation/routes/auditLogRoutes');
 const adminAppointmentRoutes = require('./src/presentation/routes/adminAppointmentRoutes');
+const adminDietRoutes = require("./src/presentation/routes/adminDietRoutes");
+
 
 
 app.use("/api/auth", authRoutes);
@@ -46,6 +48,8 @@ app.use("/api/admin/users", adminUsersRoutes);
 app.use('/api/admin/activities', adminActivitiesRoutes);
 app.use('/api/admin/audit-logs', auditLogRoutes);
 app.use('/api/admin/appointments', adminAppointmentRoutes);
+app.use("/api/admin/diets", adminDietRoutes);
+
 
 
 const sequelize = require("./src/infrastructure/config/db");
