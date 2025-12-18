@@ -18,7 +18,7 @@ import AdminUsersPage from './pages/admin/users/AdminUsersPage';
 import AdminActivitiesPage from './pages/admin/activities/AdminActivitiesPage';
 import AdminAuditLogsPage from './pages/admin/auditlogs/AdminAuditLogsPage';
 import AdminDietsPage from './pages/admin/diets/AdminDietsPage';
-
+import AdminAnalysisResultsPage from './pages/admin/analysis/AdminAnalysisResultsPage';
 import ClinicUsersPage from './pages/clinic/users/ClinicUsersPage';
 
 
@@ -63,6 +63,15 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={['admin']}>
                     <AdminUsersPage />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="analysis"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminAnalysisResultsPage />
                   </ProtectedRoute>
                 }
               />

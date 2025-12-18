@@ -67,7 +67,7 @@ const Sidebar = () => {
         return (
           <>
             <Link to="/dashboard/users" className={linkClass("/dashboard/users")}>Pacientët</Link>
-            <Link to="/analyses" className={linkClass("/analyses")}>Analizat</Link>
+            <Link to="/dashboard/analysis" className={linkClass("/dashboard/analysis")}>Analizat</Link>
             <Link to="/dashboard/diets" className={linkClass("/dashboard/diets")}>Dietat</Link>
             <Link to="/dashboard/activities" className={linkClass("/dashboard/activities")}>Aktivitetet</Link>
             <Link to="/dashboard/audit-logs" className={linkClass("/dashboard/audit-logs")}>Audit Logs</Link>
