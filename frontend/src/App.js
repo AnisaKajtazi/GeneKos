@@ -22,6 +22,7 @@ import AdminAnalysisResultsPage from './pages/admin/analysis/AdminAnalysisResult
 import ClinicUsersPage from './pages/clinic/users/ClinicUsersPage';
 import AnalysesPage from './pages/client/AnalysesPage';
 import ActivitiesPage from './pages/client/ActivitiesPage';
+import UserHealthProfileHistory from './pages/client/UserHealthProfileHistory';
 import DietsPage from './pages/client/DietsPage';
 
 
@@ -111,6 +112,7 @@ function App() {
               <Route path="client/appointments" element={<UserAppointmentsPage />} />
               <Route path="client/analyses" element={<AnalysesPage />} />
               <Route path="client/activities" element={<ActivitiesPage />} />
+              <Route path="client/health-history" element={<UserHealthProfileHistory />} />
               <Route path="client/diets" element={<DietsPage />} />
 
               <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />

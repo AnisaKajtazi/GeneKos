@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import ActivityForm from "./ActivityForm";
 import DietForm from "./DietForm";
 import AnalysisResultForm from "./AnalysisResultForm";
+import UserHealthProfileForm from "./UserHealthProfileForm"; 
 import api from '../../../api/axios';
 import '../../../styles/patientdatapage.css';
 
 const PatientDataPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [patients, setPatients] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showHealthProfile, setShowHealthProfile] = useState(false); 
 
   const SearchIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -19,13 +21,12 @@ const PatientDataPage = () => {
       <path d="m21 21-4.35-4.35" />
     </svg>
   );
-
-  const UserIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
+const UserIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
 
   const CloseIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -56,7 +57,7 @@ const PatientDataPage = () => {
     </svg>
   );
 
-  useEffect(() => {
+ useEffect(() => {
     if (!searchTerm.trim()) {
       setPatients([]);
       setError("");
@@ -68,7 +69,7 @@ const PatientDataPage = () => {
       setLoading(true);
       setError("");
       setShowDropdown(true);
-      
+
       try {
         const response = await api.get(`/users?search=${searchTerm}`);
         const activePatients = response.data.filter(patient => patient.is_active !== false);
@@ -96,6 +97,7 @@ const PatientDataPage = () => {
     setSelectedPatient(patient);
     setShowDropdown(false);
     setSearchTerm(`${patient.first_name} ${patient.last_name}`);
+    setShowHealthProfile(false); 
   };
 
   const handleSearchChange = (e) => {
@@ -116,9 +118,7 @@ const PatientDataPage = () => {
       <div className="search-section">
         <div className="search-container">
           <div className="search-box">
-            <div className="search-icon">
-              <SearchIcon />
-            </div>
+            <div className="search-icon"><SearchIcon /></div>
             <input
               type="text"
               placeholder="Shkruaj emrin ose ID e pacientit..."
@@ -143,19 +143,15 @@ const PatientDataPage = () => {
                 </span>
               </div>
               <div className="dropdown-list">
-                {patients.map((patient) => (
+                {patients.map(patient => (
                   <div
                     key={patient.id}
                     className="patient-result-item"
                     onClick={() => handlePatientSelect(patient)}
                   >
-                    <div className="patient-result-avatar">
-                      <UserIcon />
-                    </div>
+                    <div className="patient-result-avatar"><UserIcon /></div>
                     <div className="patient-result-info">
-                      <span className="patient-result-name">
-                        {patient.first_name} {patient.last_name}
-                      </span>
+                      <span className="patient-result-name">{patient.first_name} {patient.last_name}</span>
                       <span className="patient-result-id">ID: {patient.id}</span>
                     </div>
                   </div>
@@ -177,13 +173,9 @@ const PatientDataPage = () => {
         <div className="patient-data-content">
           <div className="patient-info-card">
             <div className="patient-header">
-              <div className="patient-avatar large">
-                {selectedPatient.first_name?.[0]}{selectedPatient.last_name?.[0]}
-              </div>
+              <div className="patient-avatar large">{selectedPatient.first_name?.[0]}{selectedPatient.last_name?.[0]}</div>
               <div className="patient-details">
-                <h3 className="patient-name">
-                  {selectedPatient.first_name} {selectedPatient.last_name}
-                </h3>
+                <h3 className="patient-name">{selectedPatient.first_name} {selectedPatient.last_name}</h3>
                 <div className="patient-meta">
                   <span className="patient-id">ID: {selectedPatient.id}</span>
                   <span className="patient-status active">Aktiv</span>
@@ -195,6 +187,7 @@ const PatientDataPage = () => {
                   setSelectedPatient(null);
                   setSearchTerm("");
                   setPatients([]);
+                  setShowHealthProfile(false);
                 }}
                 title="Zgjidh pacient tjetër"
               >
@@ -207,14 +200,10 @@ const PatientDataPage = () => {
             <div className="form-card-wide">
               <div className="form-card-header">
                 <div className="form-card-title">
-                  <div className="form-icon minimal-icon">
-                    <AnalysisCardIcon />
-                  </div>
+                  <div className="form-icon minimal-icon"><AnalysisCardIcon /></div>
                   <span>Analizat</span>
                 </div>
-                <p className="form-card-description">
-                  Vendosni rezultatet e analizave mjekësore
-                </p>
+                <p className="form-card-description">Vendosni rezultatet e analizave mjekësore</p>
               </div>
               <div className="form-card-body">
                 <AnalysisResultForm patientId={selectedPatient.id} />
@@ -224,14 +213,10 @@ const PatientDataPage = () => {
             <div className="form-card-wide">
               <div className="form-card-header">
                 <div className="form-card-title">
-                  <div className="form-icon minimal-icon">
-                    <ActivityCardIcon />
-                  </div>
+                  <div className="form-icon minimal-icon"><ActivityCardIcon /></div>
                   <span>Aktivitetet</span>
                 </div>
-                <p className="form-card-description">
-                  Regjistroni aktivitetet fizike të pacientit
-                </p>
+                <p className="form-card-description">Regjistroni aktivitetet fizike të pacientit</p>
               </div>
               <div className="form-card-body">
                 <ActivityForm patientId={selectedPatient.id} />
@@ -241,27 +226,38 @@ const PatientDataPage = () => {
             <div className="form-card-wide">
               <div className="form-card-header">
                 <div className="form-card-title">
-                  <div className="form-icon minimal-icon">
-                    <DietCardIcon />
-                  </div>
+                  <div className="form-icon minimal-icon"><DietCardIcon /></div>
                   <span>Dieta</span>
                 </div>
-                <p className="form-card-description">
-                  Përcaktoni planin dietik të pacientit
-                </p>
+                <p className="form-card-description">Përcaktoni planin dietik të pacientit</p>
               </div>
               <div className="form-card-body">
                 <DietForm patientId={selectedPatient.id} />
               </div>
             </div>
+
+            {showHealthProfile && (
+              <div className="form-card-wide">
+                <div className="form-card-header">
+                  <div className="form-card-title">
+                    <div className="form-icon minimal-icon"><UserIcon /></div>
+                    <span>Profili Shëndetësor</span>
+                  </div>
+                  <p className="form-card-description">Shikoni ose modifikoni profilin shëndetësor të pacientit</p>
+                </div>
+                <div className="form-card-body">
+                  <UserHealthProfileForm patientId={selectedPatient.id} />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="action-buttons">
             <button
               className="btn-primary"
-              onClick={() => alert("Redirect to Patient Health Profile")}
+              onClick={() => setShowHealthProfile(prev => !prev)}
             >
-              Profili i Shëndetit të Pacientit
+              {showHealthProfile ? "Mbyll Profilin Shëndetësor" : "Profili i Shëndetit të Pacientit"}
             </button>
           </div>
         </div>
@@ -269,25 +265,17 @@ const PatientDataPage = () => {
 
       {!selectedPatient && !error && !loading && searchTerm === "" && (
         <div className="empty-state">
-          <div className="empty-state-icon minimal-icon">
-            <UserIcon />
-          </div>
+          <div className="empty-state-icon minimal-icon"><UserIcon /></div>
           <h3 className="empty-state-title">Kërkoni një pacient</h3>
-          <p className="empty-state-description">
-            Shkruani emrin ose ID e pacientit për të filluar të shtoni të dhëna
-          </p>
+          <p className="empty-state-description">Shkruani emrin ose ID e pacientit për të filluar të shtoni të dhëna</p>
         </div>
       )}
 
       {!selectedPatient && !error && !loading && searchTerm !== "" && patients.length === 0 && (
         <div className="empty-state">
-          <div className="empty-state-icon minimal-icon">
-            <UserIcon />
-          </div>
+          <div className="empty-state-icon minimal-icon"><UserIcon /></div>
           <h3 className="empty-state-title">Nuk u gjet asnjë pacient</h3>
-          <p className="empty-state-description">
-            Asnjë pacient nuk u gjet me kërkimin: "{searchTerm}"
-          </p>
+          <p className="empty-state-description">Asnjë pacient nuk u gjet me kërkimin: "{searchTerm}"</p>
         </div>
       )}
     </div>

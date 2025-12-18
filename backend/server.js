@@ -36,6 +36,7 @@ const adminAppointmentRoutes = require('./src/presentation/routes/adminAppointme
 const adminDietRoutes = require("./src/presentation/routes/adminDietRoutes");
 const clinicUsersRoutes = require("./src/presentation/routes/clinicUsersRoutes");
 const adminAnalysisRoutes = require("./src/presentation/routes/adminAnalysisRoutes");
+const userHealthProfileRoutes = require("./src/presentation/routes/userHealthProfileRoutes");
 
 
 
@@ -53,6 +54,7 @@ app.use('/api/admin/appointments', adminAppointmentRoutes);
 app.use("/api/admin/diets", adminDietRoutes);
 app.use("/api/admin/analysis", adminAnalysisRoutes);
 app.use("/api/clinic/users", clinicUsersRoutes);
+app.use("/api/user-health-profile", userHealthProfileRoutes);
 
 
 const sequelize = require("./src/infrastructure/config/db");
@@ -65,6 +67,8 @@ const Diet = require("./src/domain/models/Diet");
 const UserHealthProfile = require("./src/domain/models/UserHealthProfile");
 const Message = require("./src/domain/models/Message");
 
+User.hasOne(UserHealthProfile, { foreignKey: "user_id", onDelete: "CASCADE" });
+UserHealthProfile.belongsTo(User, { foreignKey: "user_id" });
 
 AppointmentRequest.belongsTo(User, { foreignKey: "user_id" });
 User.hasMany(AppointmentRequest, { foreignKey: "user_id" });
