@@ -32,9 +32,10 @@ const Sidebar = () => {
             <Link to="/dashboard/client/diets" className={linkClass("/dashboard/client/diets")}>
               Dietat
             </Link>
-            <Link to="/dashboard/client//activities" className={linkClass("/dashboard/client//activities")}>
+            <Link to="/dashboard/client/activities" className={linkClass("/dashboard/client/activities")}>
               Aktivitetet
             </Link>
+                  <Link to="/dashboard/client/health-history" className={linkClass("/dashboard/client/health-history")}>Historiku Shëndetësor</Link>
             <Link to="/dashboard/chat" className={linkClass("/dashboard/chat")}>
               Chat
             </Link>
