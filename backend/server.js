@@ -36,6 +36,8 @@ const adminAppointmentRoutes = require('./src/presentation/routes/adminAppointme
 const adminDietRoutes = require("./src/presentation/routes/adminDietRoutes");
 
 const clinicUsersRoutes = require("./src/presentation/routes/clinicUsersRoutes");
+const adminAnalysisRoutes = require("./src/presentation/routes/adminAnalysisRoutes");
+
 
 
 app.use("/api/auth", authRoutes);
@@ -50,7 +52,7 @@ app.use('/api/admin/activities', adminActivitiesRoutes);
 app.use('/api/admin/audit-logs', auditLogRoutes);
 app.use('/api/admin/appointments', adminAppointmentRoutes);
 app.use("/api/admin/diets", adminDietRoutes);
-
+app.use("/api/admin/analysis", adminAnalysisRoutes);
 app.use("/api/clinic/users", clinicUsersRoutes);
 
 
@@ -64,6 +66,9 @@ const Diet = require("./src/domain/models/Diet");
 const UserHealthProfile = require("./src/domain/models/UserHealthProfile");
 const Message = require("./src/domain/models/Message");
 
+
+AppointmentRequest.belongsTo(User, { foreignKey: "user_id" });
+User.hasMany(AppointmentRequest, { foreignKey: "user_id" });
 
 Activity.belongsTo(User, { foreignKey: 'user_id' });
 User.hasMany(Activity, { foreignKey: 'user_id' });

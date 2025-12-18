@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const AnalysisResult = require("../../domain/models/AnalysisResult");
 const AppointmentRequest = require("../../domain/models/AppointmentRequest");
+const User = require("../../domain/models/User");
 
 const uploadAnalysisPDF = async (req, res) => {
   try {
@@ -61,38 +62,93 @@ const getAnalysisResultsByUser = async (req, res) => {
   }
 };
 
+const getAllAnalysisResults = async (req, res) => {
+  try {
+    const results = await AnalysisResult.findAll({
+      include: [
+        {
+          model: AppointmentRequest,
+          attributes: ["id", "scheduled_date", "status", "user_id"],
+          include: [
+            {
+              model: User,
+              attributes: ["id", "first_name", "last_name"],
+            },
+          ],
+        },
+      ],
+      order: [["uploaded_at", "DESC"]],
+    });
+
+    res.json(results);
+  } catch (err) {
+    console.error("FETCH ALL ANALYSIS ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 const updateAnalysisPDF = async (req, res) => {
   try {
     const { id } = req.params;
-    const { analysis_type, request_id } = req.body; 
+    const { analysis_type, request_id, user_id } = req.body;
 
-    const analysis = await AnalysisResult.findByPk(id);
-    if (!analysis) {
-      return res.status(404).json({ message: "Analysis not found" });
-    }
+    const analysis = await AnalysisResult.findByPk(id, {
+      include: [
+        {
+          model: AppointmentRequest,
+          include: [
+            { model: User, attributes: ["id", "first_name", "last_name"] },
+          ],
+        },
+      ],
+    });
 
-    if (analysis_type) {
-      analysis.analysis_type = analysis_type;
-    }
+    if (!analysis) return res.status(404).json({ message: "Analysis not found" });
 
     if (request_id) {
+      const appointment = await AppointmentRequest.findByPk(request_id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Selected appointment does not exist" });
+      }
+      if (user_id && appointment.user_id.toString() !== user_id.toString()) {
+        return res.status(400).json({ message: "Appointment does not belong to selected user" });
+      }
       analysis.request_id = request_id;
     }
+
+    if (analysis_type) analysis.analysis_type = analysis_type;
 
     if (req.file) {
       const oldPath = path.join(__dirname, "../../../", analysis.pdf_url);
       if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-
       analysis.pdf_url = `/uploads/analyses/${req.file.filename}`;
     }
 
     await analysis.save();
-    res.json(analysis);
+
+    const updatedAnalysis = await AnalysisResult.findByPk(id, {
+      include: [
+        {
+          model: AppointmentRequest,
+          attributes: ["id", "scheduled_date", "status", "user_id"],
+          include: [
+            {
+              model: User,
+              attributes: ["id", "first_name", "last_name"],
+            },
+          ],
+        },
+      ],
+    });
+
+    res.json(updatedAnalysis);
   } catch (err) {
     console.error("UPDATE ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 
 const deleteAnalysisResult = async (req, res) => {
@@ -119,6 +175,7 @@ const deleteAnalysisResult = async (req, res) => {
 module.exports = {
   uploadAnalysisPDF,
   getAnalysisResultsByUser,
+  getAllAnalysisResults,
   updateAnalysisPDF,
   deleteAnalysisResult,
 };

@@ -15,7 +15,6 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
 
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -31,49 +30,69 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
     fetchUsers();
   }, [token]);
 
+  const fetchRequestsForUser = async (user_id) => {
+    if (!user_id) {
+      setRequests([]);
+      return [];
+    }
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/admin/appointments/user/${user_id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const completedAppointments = (res.data.appointments || res.data || []).filter(
+        (r) => r.status === "completed"
+      );
+      const formatted = completedAppointments.map((r) => ({
+        ...r,
+        label: `Takimi #${r.id} - ${new Date(r.scheduled_date).toLocaleString()}`,
+      }));
+      setRequests(formatted);
+      return formatted;
+    } catch (err) {
+      console.error("Error fetching requests:", err);
+      setRequests([]);
+      return [];
+    }
+  };
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      if (!form.user_id) {
-        setRequests([]);
-        setForm((prev) => ({ ...prev, request_id: "" }));
-        return;
-      }
+  const loadEditingData = async () => {
+    if (editingResult && users.length > 0) {
+      const user_id = editingResult.AppointmentRequest?.user_id || "";
+      const request_id = editingResult.request_id || "";
+      const analysis_type = editingResult.analysis_type || "";
 
-      try {
-        const res = await axios.get(
-          `http://localhost:5000/api/admin/appointments/user/${form.user_id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+      const fetchedRequests = await fetchRequestsForUser(user_id);
 
-        const completedAppointments = (res.data.appointments || res.data || []).filter(
-          (r) => r.status === "completed"
-        );
+      const validRequestId = fetchedRequests.some((r) => r.id === request_id)
+        ? request_id
+        : "";
 
-        const formattedRequests = completedAppointments.map((r) => ({
-          ...r,
-          label: `Appointment ${r.id} - ${new Date(r.scheduled_date).toLocaleString()}`,
-        }));
+      setForm({
+        user_id,
+        request_id: validRequestId,
+        analysis_type,
+        pdf: null,
+      });
+    } else if (!editingResult) {
+      setForm(emptyForm);
+      setRequests([]);
+    }
+  };
 
-        setRequests(formattedRequests);
+  loadEditingData();
+}, [editingResult, users]);
 
-        if (!formattedRequests.some((r) => r.id === form.request_id)) {
+  useEffect(() => {
+    if (!editingResult) {
+      fetchRequestsForUser(form.user_id).then((fetchedRequests) => {
+        if (!fetchedRequests.some((r) => r.id === form.request_id)) {
           setForm((prev) => ({ ...prev, request_id: "" }));
         }
-      } catch (err) {
-        console.error("Error fetching requests:", err);
-        setRequests([]);
-      }
-    };
-
-    fetchRequests();
-  }, [form.user_id, token]);
-
-
-  useEffect(() => {
-    if (editingResult) setForm(editingResult);
-    else setForm(emptyForm);
-  }, [editingResult]);
+      });
+    }
+  }, [form.user_id, editingResult]);
 
   const handleChange = (e) => {
     if (e.target.name === "pdf") {
@@ -90,7 +109,7 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
 
   return (
     <form onSubmit={submit} style={{ marginBottom: "20px" }}>
-      <h3>{editingResult ? "Edit Analysis Result" : "Upload Analysis Result"}</h3>
+      <h3>{editingResult ? "Edit Analysis" : "Upload Analysis"}</h3>
 
       <div style={{ marginBottom: "10px" }}>
         <label>User:</label>
@@ -100,7 +119,7 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
           onChange={handleChange}
           required
         >
-          <option value="">-- Select User --</option>
+          <option value="">-- Zgjedh Përdoruesin --</option>
           {users.map((u) => (
             <option key={u.id} value={u.id}>
               {u.first_name} {u.last_name}
@@ -110,14 +129,14 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
       </div>
 
       <div style={{ marginBottom: "10px" }}>
-        <label>Appointment Request:</label>
+        <label>Takimi i përfunduar:</label>
         <select
           name="request_id"
           value={form.request_id || ""}
           onChange={handleChange}
           required
         >
-          <option value="">-- Select Completed Appointment --</option>
+          <option value="">-- Zgjedh Takimin --</option>
           {requests.map((r) => (
             <option key={r.id} value={r.id}>
               {r.label}
@@ -127,19 +146,18 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
       </div>
 
       <div style={{ marginBottom: "10px" }}>
-        <label>Analysis Type:</label>
+        <label>Lloji i Analizës:</label>
         <input
           type="text"
           name="analysis_type"
           value={form.analysis_type}
           onChange={handleChange}
-          placeholder="Analysis type"
           required
         />
       </div>
 
       <div style={{ marginBottom: "10px" }}>
-        <label>PDF File:</label>
+        <label>PDF:</label>
         <input
           type="file"
           name="pdf"
@@ -149,12 +167,12 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
         />
       </div>
 
-      <div style={{ marginTop: "10px" }}>
-        <button type="submit" style={{ marginRight: "10px" }}>
-          {editingResult ? "Update" : "Upload"}
-        </button>
-        <button type="button" onClick={onCancel}>Cancel</button>
-      </div>
+      <button type="submit" style={{ marginRight: "10px" }}>
+        {editingResult ? "Update" : "Upload"}
+      </button>
+      <button type="button" onClick={onCancel}>
+        Cancel
+      </button>
     </form>
   );
 };
