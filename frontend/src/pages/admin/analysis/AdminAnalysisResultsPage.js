@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import AdminAnalysisResultsTable from "./AdminAnalysisResultsTable";
 import AdminAnalysisResultForm from "./AdminAnalysisResultForm";
@@ -9,19 +9,27 @@ const AdminAnalysisResultsPage = () => {
   const [editingResult, setEditingResult] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  const token = localStorage.getItem("token");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const limit = 10;
 
-  const fetchResults = async () => {
+  const token = localStorage.getItem("token");
+  const debounceRef = useRef(null);
+
+  const fetchResults = async (pageNumber = 1, search = "") => {
     try {
       setLoading(true);
       const res = await axios.get(
-        "http://localhost:5000/api/admin/analysis",
+        `http://localhost:5000/api/admin/analysis?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(search)}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setResults(res.data); 
+
+      setResults(res.data.analysisResults || []);
+      setPage(res.data.page || 1);
+      setTotalPages(res.data.totalPages || 1);
     } catch (err) {
-      console.error(err);
-      alert("Gabim në marrjen e analizave");
+      console.error("Gabim në marrjen e analizave:", err);
     } finally {
       setLoading(false);
     }
@@ -64,7 +72,7 @@ const AdminAnalysisResultsPage = () => {
 
       setEditingResult(null);
       setShowForm(false);
-      fetchResults();
+      fetchResults(1, searchTerm); // refresh page 1 after save
     } catch (err) {
       console.error(err);
       alert("Gabim gjatë ruajtjes së analizës");
@@ -73,15 +81,16 @@ const AdminAnalysisResultsPage = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("A je i sigurt?")) return;
+
     try {
       await axios.delete(
         `http://localhost:5000/api/admin/analysis/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchResults();
+      fetchResults(page, searchTerm);
     } catch (err) {
       console.error(err);
-      alert("Gabim gjatë fshirjes");
+      alert("Gabim gjatë fshirjes së analizës");
     }
   };
 
@@ -94,28 +103,46 @@ const AdminAnalysisResultsPage = () => {
     setShowForm(true);
   };
 
+  const handleCreate = () => {
+    setEditingResult(null);
+    setShowForm(true);
+  };
+
   const handleCancel = () => {
     setEditingResult(null);
     setShowForm(false);
+  };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      fetchResults(1, value);
+    }, 500);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    fetchResults(newPage, searchTerm);
   };
 
   return (
     <div>
       <h1>Analizat</h1>
 
+      <input
+        type="text"
+        placeholder="Kërko analizë ose pacient..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ marginBottom: "10px", marginRight: "5px" }}
+      />
+
       {!showForm && (
-        <button
-          onClick={() => setShowForm(true)}
-          style={{
-            marginBottom: "15px",
-            padding: "6px 12px",
-            backgroundColor: "#1b7f5a",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={handleCreate} style={{ marginBottom: "10px" }}>
           Upload Analysis
         </button>
       )}
@@ -129,11 +156,28 @@ const AdminAnalysisResultsPage = () => {
       )}
 
       <AdminAnalysisResultsTable
-        results={results}
+        results={Array.isArray(results) ? results : []}
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
+
+      <div style={{ marginTop: "10px" }}>
+        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+          Previous
+        </button>
+
+        <span style={{ margin: "0 10px" }}>
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
