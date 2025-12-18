@@ -31,12 +31,6 @@ const UserHealthProfileHistory = ({ patientId }) => {
     </svg>
   );
 
-  const ClockIcon = () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
 
   const RefreshIcon = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -98,18 +92,6 @@ const UserHealthProfileHistory = ({ patientId }) => {
     </svg>
   );
 
-  const formatDate = dateString => {
-    const date = new Date(dateString);
-    const options = { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    };
-    return date.toLocaleDateString('sq-AL', options);
-  };
 
   useEffect(() => {
     if (!user) return;
@@ -361,88 +343,97 @@ const UserHealthProfileHistory = ({ patientId }) => {
             </div>
 
             <div style={{ padding: '1rem', maxHeight: '500px', overflowY: 'auto' }}>
-              {profiles.map(profile => (
-                <div
-                  key={profile.id}
-                  onClick={() => setSelectedProfile(profile)}
-                  style={{
-                    padding: '1rem',
-                    borderRadius: '0.75rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    background: selectedProfile?.id === profile.id 
-                      ? primaryColorLight 
-                      : 'transparent',
-                    border: selectedProfile?.id === profile.id
-                      ? `1px solid ${primaryColorMedium}`
-                      : '1px solid transparent',
-                    marginBottom: '0.5rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedProfile?.id !== profile.id) {
-                      e.currentTarget.style.background = '#f9fafb';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedProfile?.id !== profile.id) {
-                      e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.borderColor = 'transparent';
-                    }
-                  }}
-                >
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    marginBottom: '0.5rem'
-                  }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '0.5rem',
-                      background: selectedProfile?.id === profile.id
-                        ? 'rgba(59, 130, 246, 0.15)'
-                        : 'rgba(59, 130, 246, 0.08)',
-                      color: selectedProfile?.id === profile.id ? primaryColor : '#6b7280',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <CalendarIcon />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        fontSize: '0.95rem',
-                        fontWeight: '600',
-                        color: selectedProfile?.id === profile.id ? primaryColor : '#111827',
-                        lineHeight: '1.2'
-                      }}>
-                        {formatDate(profile.createdAt)}
-                      </div>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        fontSize: '0.85rem',
-                        color: '#6b7280',
-                        marginTop: '0.25rem'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <HeightIcon />
-                          <span>{profile.height} cm</span>
-                        </div>
-                        <span>•</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <WeightIcon />
-                          <span>{profile.weight} kg</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+             {profiles.map(profile => (
+  <div
+    key={profile.id}
+    onClick={() => setSelectedProfile(profile)}
+    style={{
+      padding: '1rem',
+      borderRadius: '0.75rem',
+      cursor: 'pointer',
+      transition: 'all 0.2s ease',
+      background: selectedProfile?.id === profile.id 
+        ? primaryColorLight 
+        : 'transparent',
+      border: selectedProfile?.id === profile.id
+        ? `1px solid ${primaryColorMedium}`
+        : '1px solid transparent',
+      marginBottom: '0.5rem'
+    }}
+    onMouseEnter={(e) => {
+      if (selectedProfile?.id !== profile.id) {
+        e.currentTarget.style.background = '#f9fafb';
+        e.currentTarget.style.borderColor = '#e5e7eb';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (selectedProfile?.id !== profile.id) {
+        e.currentTarget.style.background = 'transparent';
+        e.currentTarget.style.borderColor = 'transparent';
+      }
+    }}
+  >
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.75rem',
+      marginBottom: '0.5rem'
+    }}>
+      <div style={{
+        width: '40px',
+        height: '40px',
+        borderRadius: '0.5rem',
+        background: selectedProfile?.id === profile.id
+          ? 'rgba(59, 130, 246, 0.15)'
+          : 'rgba(59, 130, 246, 0.08)',
+        color: selectedProfile?.id === profile.id ? primaryColor : '#6b7280',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0
+      }}>
+        <CalendarIcon />
+      </div>
+
+      <div style={{ flex: 1 }}>
+        {profile.appointment && (
+          <div style={{ fontSize: '0.9rem', fontWeight: '500', color: '#111827' }}>
+            Takimi: {new Date(profile.appointment.scheduled_date).toLocaleString('sq-AL')} ({profile.appointment.status})
+          </div>
+        )}
+
+        <div style={{
+          fontSize: '0.95rem',
+          fontWeight: '600',
+          color: selectedProfile?.id === profile.id ? primaryColor : '#111827',
+          lineHeight: '1.2',
+          marginTop: '0.25rem'
+        }}>
+        </div>
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          fontSize: '0.85rem',
+          color: '#6b7280',
+          marginTop: '0.25rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <HeightIcon />
+            <span>{profile.height} cm</span>
+          </div>
+          <span>•</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <WeightIcon />
+            <span>{profile.weight} kg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+))}
+
             </div>
           </div>
 
@@ -499,8 +490,6 @@ const UserHealthProfileHistory = ({ patientId }) => {
                           alignItems: 'center',
                           gap: '0.5rem'
                         }}>
-                          <CalendarIcon />
-                          {formatDate(selectedProfile.createdAt)}
                         </p>
                       </div>
                     </div>
@@ -528,7 +517,6 @@ const UserHealthProfileHistory = ({ patientId }) => {
                   gap: '1.5rem',
                   marginBottom: '2rem'
                 }}>
-                  {/* Height and Weight Section */}
                   <div style={{
                     background: '#f9fafb',
                     borderRadius: '0.75rem',
@@ -839,57 +827,7 @@ const UserHealthProfileHistory = ({ patientId }) => {
                   </div>
                 </div>
 
-                <div style={{
-                  background: primaryColorLight,
-                  borderRadius: '0.75rem',
-                  border: '1px solid #e5e7eb',
-                  padding: '1.5rem',
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '1.5rem'
-                }}>
-                  <div>
-                    <div style={{
-                      fontSize: '0.875rem',
-                      color: '#6b7280',
-                      marginBottom: '0.5rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem'
-                    }}>
-                      <CalendarIcon />
-                      Krijuar më
-                    </div>
-                    <div style={{
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      color: '#111827'
-                    }}>
-                      {formatDate(selectedProfile.createdAt)}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div style={{
-                      fontSize: '0.875rem',
-                      color: '#6b7280',
-                      marginBottom: '0.5rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem'
-                    }}>
-                      <ClockIcon />
-                      Përditësuar më
-                    </div>
-                    <div style={{
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      color: '#111827'
-                    }}>
-                      {selectedProfile.updatedAt ? formatDate(selectedProfile.updatedAt) : 'Nuk është përditësuar'}
-                    </div>
-                  </div>
-                </div>
+
               </div>
             )}
           </div>

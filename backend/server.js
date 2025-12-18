@@ -82,6 +82,17 @@ AppointmentRequest.hasMany(Activity, { foreignKey: 'request_id' });
 AppointmentRequest.hasMany(AnalysisResult, { foreignKey: 'request_id', onDelete: 'CASCADE' });
 AnalysisResult.belongsTo(AppointmentRequest, { foreignKey: 'request_id' });
 
+UserHealthProfile.belongsTo(AppointmentRequest, {
+  foreignKey: { name: "request_id", allowNull: false, unique: true },
+  as: "appointment",
+  onDelete: "CASCADE"
+});
+
+AppointmentRequest.hasOne(UserHealthProfile, {
+  foreignKey: "request_id",
+  as: "healthProfile"
+});
+
 AnalysisResult.hasMany(Activity, { foreignKey: 'analysis_id', onDelete: 'CASCADE' });
 Activity.belongsTo(AnalysisResult, { foreignKey: 'analysis_id' });
 

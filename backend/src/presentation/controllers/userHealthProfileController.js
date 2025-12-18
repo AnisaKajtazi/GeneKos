@@ -1,10 +1,19 @@
 const UserHealthProfile = require('../../domain/models/UserHealthProfile');
+const AppointmentRequest = require('../../domain/models/AppointmentRequest');
 const User = require('../../domain/models/User');
 const AuditLog = require('../../domain/models/AuditLog');
 
 const createAuditLog = async ({ userId, username, role, action, entity, entityId, description }) => {
   try {
-    await AuditLog.create({ user_id: userId, username, role, action, entity, entity_id: entityId, description });
+    await AuditLog.create({
+      user_id: userId,
+      username,
+      role,
+      action,
+      entity,
+      entity_id: entityId,
+      description
+    });
   } catch (err) {
     console.error("Audit log error:", err);
   }
@@ -12,12 +21,25 @@ const createAuditLog = async ({ userId, username, role, action, entity, entityId
 
 exports.createProfile = async (req, res) => {
   try {
-    const { user_id, height, weight, blood_type, allergies, medical_conditions, medications } = req.body;
-    if (!user_id) return res.status(400).json({ message: "User ID is required" });
+    const { user_id, request_id, height, weight, blood_type, allergies, medical_conditions, medications } = req.body;
 
-    const profile = await UserHealthProfile.create({
-      user_id, height, weight, blood_type, allergies, medical_conditions, medications
+    if (!user_id || !request_id) {
+      return res.status(400).json({ message: "User ID dhe Request ID janë të detyrueshme" });
+    }
+
+    const appointment = await AppointmentRequest.findByPk(request_id, {
+      include: [{ model: UserHealthProfile, as: "healthProfile" }]
     });
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Takimi nuk u gjet" });
+    }
+
+    if (appointment.healthProfile) {
+      return res.status(400).json({ message: "Ky takim ka tashmë një profil shëndetësor." });
+    }
+
+    const profile = await UserHealthProfile.create({ user_id, request_id, height, weight, blood_type, allergies, medical_conditions, medications });
 
     if (req.user) {
       await createAuditLog({
@@ -27,7 +49,7 @@ exports.createProfile = async (req, res) => {
         action: "create",
         entity: "UserHealthProfile",
         entityId: profile.id,
-        description: `U krijua profile shëndetësor për user_id=${user_id}`
+        description: `U krijua profili shëndetësor për user_id=${user_id} (request_id=${request_id})`
       });
     }
 
@@ -38,19 +60,26 @@ exports.createProfile = async (req, res) => {
   }
 };
 
+
 exports.getProfileByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
+
     const profiles = await UserHealthProfile.findAll({
       where: { user_id: userId },
-      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: AppointmentRequest,
+          as: "appointment",
+          attributes: ["id", "scheduled_date", "status"]
+        }
+      ],
+      order: [["created_at", "DESC"]]
     });
-    if (!profiles || profiles.length === 0) {
-      return res.status(404).json({ message: "No profiles found" });
-    }
+
     return res.json(profiles);
   } catch (err) {
-    console.error(err);
+    console.error("GET PROFILE ERROR:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
@@ -59,10 +88,28 @@ exports.getProfileByUserId = async (req, res) => {
 exports.updateProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const { height, weight, blood_type, allergies, medical_conditions, medications } = req.body;
+    const {
+      height,
+      weight,
+      blood_type,
+      allergies,
+      medical_conditions,
+      medications,
+      request_id
+    } = req.body;
 
     const profile = await UserHealthProfile.findByPk(id);
-    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    if (!profile) {
+      return res.status(404).json({ message: "Profili nuk u gjet" });
+    }
+
+    if (request_id && request_id !== profile.request_id) {
+      const appointment = await AppointmentRequest.findByPk(request_id);
+      if (!appointment) {
+        return res.status(404).json({ message: "Takimi nuk u gjet" });
+      }
+      profile.request_id = request_id;
+    }
 
     profile.height = height ?? profile.height;
     profile.weight = weight ?? profile.weight;
@@ -72,23 +119,53 @@ exports.updateProfile = async (req, res) => {
     profile.medications = medications ?? profile.medications;
 
     await profile.save();
+
+    if (req.user) {
+      await createAuditLog({
+        userId: req.user.id,
+        username: req.user.username,
+        role: req.user.role,
+        action: "update",
+        entity: "UserHealthProfile",
+        entityId: profile.id,
+        description: `U përditësua profili shëndetësor me ID=${profile.id}`
+      });
+    }
+
     return res.json(profile);
   } catch (err) {
-    console.error(err);
+    console.error("UPDATE PROFILE ERROR:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
+
 exports.deleteProfile = async (req, res) => {
   try {
     const { id } = req.params;
+
     const profile = await UserHealthProfile.findByPk(id);
-    if (!profile) return res.status(404).json({ message: "Profile not found" });
+    if (!profile) {
+      return res.status(404).json({ message: "Profili nuk u gjet" });
+    }
 
     await profile.destroy();
-    return res.json({ message: "Profile deleted successfully" });
+
+    if (req.user) {
+      await createAuditLog({
+        userId: req.user.id,
+        username: req.user.username,
+        role: req.user.role,
+        action: "delete",
+        entity: "UserHealthProfile",
+        entityId: id,
+        description: `U fshi profili shëndetësor me ID=${id}`
+      });
+    }
+
+    return res.json({ message: "Profili u fshi me sukses" });
   } catch (err) {
-    console.error(err);
+    console.error("DELETE PROFILE ERROR:", err);
     return res.status(500).json({ message: "Server error", error: err.message });
   }
 };
