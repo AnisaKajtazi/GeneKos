@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import AdminAnalysisResultsTable from './AdminAnalysisResultsTable';
-import AdminAnalysisResultForm from './AdminAnalysisResultForm';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import AdminAnalysisResultsTable from "./AdminAnalysisResultsTable";
+import AdminAnalysisResultForm from "./AdminAnalysisResultForm";
 
 const AdminAnalysisResultsPage = () => {
   const [results, setResults] = useState([]);
@@ -9,30 +9,31 @@ const AdminAnalysisResultsPage = () => {
   const [editingResult, setEditingResult] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const fetchResults = async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        'http://localhost:5000/api/admin/analysis',
+        "http://localhost:5000/api/admin/analysis",
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setResults(res.data.results || []);
+      setResults(res.data); 
     } catch (err) {
       console.error(err);
-      alert("Error fetching analysis results");
+      alert("Gabim në marrjen e analizave");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => { fetchResults(); }, []);
+  useEffect(() => {
+    fetchResults();
+  }, []);
 
   const handleSave = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("user_id", data.user_id);
       formData.append("request_id", data.request_id);
       formData.append("analysis_type", data.analysis_type);
       if (data.pdf) formData.append("pdf", data.pdf);
@@ -41,13 +42,23 @@ const AdminAnalysisResultsPage = () => {
         await axios.put(
           `http://localhost:5000/api/admin/analysis/${editingResult.id}`,
           formData,
-          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
       } else {
         await axios.post(
-          'http://localhost:5000/api/admin/analysis',
+          "http://localhost:5000/api/admin/analysis",
           formData,
-          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
       }
 
@@ -56,12 +67,12 @@ const AdminAnalysisResultsPage = () => {
       fetchResults();
     } catch (err) {
       console.error(err);
-      alert("Error saving analysis result");
+      alert("Gabim gjatë ruajtjes së analizës");
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure?")) return;
+    if (!window.confirm("A je i sigurt?")) return;
     try {
       await axios.delete(
         `http://localhost:5000/api/admin/analysis/${id}`,
@@ -70,12 +81,16 @@ const AdminAnalysisResultsPage = () => {
       fetchResults();
     } catch (err) {
       console.error(err);
-      alert("Error deleting analysis result");
+      alert("Gabim gjatë fshirjes");
     }
   };
 
   const handleEdit = (result) => {
-    setEditingResult(result);
+    setEditingResult({
+      id: result.id,
+      request_id: result.request_id,
+      analysis_type: result.analysis_type,
+    });
     setShowForm(true);
   };
 
@@ -86,7 +101,7 @@ const AdminAnalysisResultsPage = () => {
 
   return (
     <div>
-      <h1>Analysis Results</h1>
+      <h1>Analizat</h1>
 
       {!showForm && (
         <button
@@ -94,14 +109,14 @@ const AdminAnalysisResultsPage = () => {
           style={{
             marginBottom: "15px",
             padding: "6px 12px",
-            backgroundColor: "#2196F3",
+            backgroundColor: "#1b7f5a",
             color: "white",
             border: "none",
             borderRadius: "4px",
-            cursor: "pointer"
+            cursor: "pointer",
           }}
         >
-          Upload Analysis Result
+          Upload Analysis
         </button>
       )}
 
