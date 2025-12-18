@@ -5,10 +5,11 @@ const emptyForm = {
   user_id: "",
   request_id: "",
   activity_plan: "",
+  analysis_id: null,
 };
 
 const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState({ ...emptyForm });
   const [users, setUsers] = useState([]);
   const [requests, setRequests] = useState([]);
 
@@ -44,7 +45,7 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
         );
 
         const completedAppointments = (res.data.appointments || res.data || []).filter(
-          (r) => r.status === "completed" 
+          (r) => r.status === "completed"
         );
 
         const formattedRequests = completedAppointments.map((r) => ({
@@ -67,21 +68,36 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
   }, [form.user_id, token]);
 
   useEffect(() => {
-    if (editingActivity) setForm(editingActivity);
-    else setForm(emptyForm);
+    if (editingActivity) {
+      setForm({
+        user_id: editingActivity.user_id || "",
+        request_id: editingActivity.request_id || "",
+        activity_plan: editingActivity.activity_plan || "",
+        analysis_id: editingActivity.analysis_id || null,
+      });
+    } else {
+      setForm({ ...emptyForm });
+    }
   }, [editingActivity]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const submit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     onSave(form);
+    if (!editingActivity) setForm({ ...emptyForm });
+  };
+
+  const handleCancel = () => {
+    setForm({ ...emptyForm });
+    if (onCancel) onCancel();
   };
 
   return (
-    <form onSubmit={submit} style={{ marginBottom: "20px" }}>
+    <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
       <h3>{editingActivity ? "Edit Activity" : "Create Activity"}</h3>
 
       <div style={{ marginBottom: "10px" }}>
@@ -130,12 +146,21 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
         />
       </div>
 
+      <div style={{ marginBottom: "10px" }}>
+        <label>Analysis ID (optional):</label>
+        <input
+          type="number"
+          name="analysis_id"
+          value={form.analysis_id || ""}
+          onChange={handleChange}
+        />
+      </div>
+
       <div style={{ marginTop: "10px" }}>
         <button type="submit" style={{ marginRight: "10px" }}>
           {editingActivity ? "Update" : "Create"}
         </button>
-
-        <button type="button" onClick={onCancel}>
+        <button type="button" onClick={handleCancel}>
           Cancel
         </button>
       </div>
