@@ -97,11 +97,11 @@ const AdminAuditLogsPage = () => {
           disabled={page === 1}
           onClick={() => handlePageChange(page - 1)}
         >
-          Previous
+          Para
         </button>
 
         <span>
-          Page {page} of {totalPages}
+          Faqja {page} nga {totalPages}
         </span>
 
         <button
@@ -109,7 +109,7 @@ const AdminAuditLogsPage = () => {
           disabled={page === totalPages}
           onClick={() => handlePageChange(page + 1)}
         >
-          Next
+          Pas
         </button>
       </div>
     </div>

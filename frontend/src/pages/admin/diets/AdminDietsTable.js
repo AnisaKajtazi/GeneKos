@@ -9,9 +9,9 @@ const AdminDietsTable = ({ diets, loading, onEdit, onDelete }) => {
         <tr>
           <th>ID</th>
           <th>User</th>
-          <th>Request</th>
-          <th>Diet Plan</th>
-          <th>Created At</th>
+          <th>Kërkesa</th>
+          <th>Plani i Dietës</th>
+          <th>Krijuar</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -19,7 +19,7 @@ const AdminDietsTable = ({ diets, loading, onEdit, onDelete }) => {
         {diets.length === 0 && (
           <tr>
             <td colSpan="6" className="admin-table-empty">
-              No diets found
+              Nuk u gjet asnjë dietë
             </td>
           </tr>
         )}
@@ -42,10 +42,10 @@ const AdminDietsTable = ({ diets, loading, onEdit, onDelete }) => {
               <td>{new Date(d.created_at).toLocaleString()}</td>
               <td className="admin-actions-cell">
                 <button className="admin-btn success" onClick={() => onEdit(d)}>
-                  Edit
+                  Përditëso
                 </button>
                 <button className="admin-btn danger" onClick={() => onDelete(d.id)}>
-                  Delete
+                  Fshij
                 </button>
               </td>
             </tr>

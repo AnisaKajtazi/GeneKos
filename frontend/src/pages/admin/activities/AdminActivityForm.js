@@ -115,7 +115,7 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
             onChange={handleChange}
             required
           >
-            <option value="">-- Select User --</option>
+            <option value="">-- Selekto User --</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.first_name} {u.last_name}
@@ -125,14 +125,14 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Appointment Request:</label>
+          <label>Kërkesa e Terminit:</label>
           <select
             name="request_id"
             value={form.request_id || ""}
             onChange={handleChange}
             required
           >
-            <option value="">-- Select Completed Appointment --</option>
+            <option value="">-- Selekto Terminin e Kryer --</option>
             {requests.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.label}
@@ -142,7 +142,7 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group full">
-          <label>Activity Plan:</label>
+          <label>Plani i Aktiviteteve:</label>
           <textarea
             name="activity_plan"
             placeholder="Activity plan"
@@ -154,7 +154,7 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Analysis ID (optional):</label>
+          <label>ID e Analizës(optional):</label>
           <input
             type="number"
             name="analysis_id"

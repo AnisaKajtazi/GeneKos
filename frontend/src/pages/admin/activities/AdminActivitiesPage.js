@@ -128,7 +128,7 @@ const AdminActivitiesPage = () => {
               className="admin-btn primary"
               onClick={() => setShowForm(true)}
             >
-              Create Activity
+              Krijo Aktivitet
             </button>
           )}
         </div>
@@ -162,11 +162,11 @@ const AdminActivitiesPage = () => {
           disabled={page === 1}
           onClick={() => handlePageChange(page - 1)}
         >
-          Previous
+          Para
         </button>
 
         <span>
-          Page {page} of {totalPages}
+          Faqja {page} nga {totalPages}
         </span>
 
         <button
@@ -174,7 +174,7 @@ const AdminActivitiesPage = () => {
           disabled={page === totalPages}
           onClick={() => handlePageChange(page + 1)}
         >
-          Next
+          Pas
         </button>
       </div>
 

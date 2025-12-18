@@ -14,7 +14,7 @@ const AdminAnalysisResultsTable = ({ results, loading, onEdit, onDelete }) => {
             <th>Analiza</th>
             <th>PDF</th>
             <th>Data</th>
-            <th className="admin-center">Veprime</th>
+            <th className="admin-center">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -49,7 +49,7 @@ const AdminAnalysisResultsTable = ({ results, loading, onEdit, onDelete }) => {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      View PDF
+                      Shiko PDF
                     </a>
                   ) : (
                     "-"
@@ -62,14 +62,14 @@ const AdminAnalysisResultsTable = ({ results, loading, onEdit, onDelete }) => {
                     onClick={() => onEdit(r)}
                     title="Edit Analysis"
                   >
-                    Edit
+                    Përditëso
                   </button>
                   <button
                     className="admin-btn small danger"
                     onClick={() => onDelete(r.id)}
                     title="Delete Analysis"
                   >
-                    Delete
+                    Fshij
                   </button>
                 </td>
               </tr>

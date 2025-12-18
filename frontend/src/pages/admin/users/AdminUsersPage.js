@@ -122,7 +122,7 @@ const AdminUsersPage = () => {
           />
           {!showForm && (
             <button className="admin-btn primary" onClick={handleCreate}>
-              Create User
+              Krijo User
             </button>
           )}
         </div>
@@ -153,11 +153,11 @@ const AdminUsersPage = () => {
           disabled={page === 1}
           onClick={() => handlePageChange(page - 1)}
         >
-          Previous
+          Para
         </button>
 
         <span>
-          Page {page} of {totalPages}
+          Faqja {page} nga {totalPages}
         </span>
 
         <button
@@ -165,7 +165,7 @@ const AdminUsersPage = () => {
           disabled={page === totalPages}
           onClick={() => handlePageChange(page + 1)}
         >
-          Next
+          Pas
         </button>
       </div>
     </div>

@@ -9,12 +9,12 @@ const AdminAuditLogsTable = ({ logs, loading, onDelete }) => {
         <tr>
           <th>ID</th>
           <th>User</th>
-          <th>Role</th>
+          <th>Roli</th>
           <th>Action</th>
-          <th>Entity</th>
-          <th>Entity ID</th>
-          <th>Description</th>
-          <th>Created At</th>
+          <th>Entiteti</th>
+          <th>ID e Entitetit</th>
+          <th>Përshkrimi</th>
+          <th>Krijuar</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -23,7 +23,7 @@ const AdminAuditLogsTable = ({ logs, loading, onDelete }) => {
         {logs.length === 0 && (
           <tr>
             <td colSpan="9" className="admin-table-empty">
-              No logs found
+              Nuk u gjet asnjë Log
             </td>
           </tr>
         )}
@@ -40,7 +40,7 @@ const AdminAuditLogsTable = ({ logs, loading, onDelete }) => {
             <td>{new Date(log.created_at).toLocaleString()}</td>
             <td className="admin-actions-cell">
               <button className="admin-btn danger" onClick={() => onDelete(log.id)}>
-                Delete
+                Fshij
               </button>
             </td>
           </tr>

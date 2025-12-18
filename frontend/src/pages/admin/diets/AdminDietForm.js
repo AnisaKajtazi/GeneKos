@@ -89,7 +89,7 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
         <div className="admin-form-group">
           <label>User:</label>
           <select name="user_id" value={form.user_id} onChange={handleChange} required>
-            <option value="">-- Select User --</option>
+            <option value="">-- Selekto Userin --</option>
             {users.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.first_name} {u.last_name}
@@ -99,14 +99,14 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Appointment Request:</label>
+          <label>Kërkesa për Termin:</label>
           <select
             name="request_id"
             value={form.request_id || ""}
             onChange={handleChange}
             required
           >
-            <option value="">-- Select Completed Appointment --</option>
+            <option value="">-- Selekto Terminin e Kryer --</option>
             {requests.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.label}
@@ -116,7 +116,7 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group full">
-          <label>Diet Plan:</label>
+          <label>Plani i Dietës:</label>
           <textarea
             name="diet_plan"
             placeholder="Diet plan"

@@ -141,7 +141,7 @@ const AdminAnalysisResultsPage = () => {
           />
           {!showForm && (
             <button className="admin-btn primary" onClick={handleCreate}>
-              Upload Analysis
+              Upload Analizat
             </button>
           )}
         </div>
@@ -172,11 +172,11 @@ const AdminAnalysisResultsPage = () => {
           disabled={page === 1}
           onClick={() => handlePageChange(page - 1)}
         >
-          Previous
+          Para
         </button>
 
         <span>
-          Page {page} of {totalPages}
+          Faqja {page} nga {totalPages}
         </span>
 
         <button
@@ -184,7 +184,7 @@ const AdminAnalysisResultsPage = () => {
           disabled={page === totalPages}
           onClick={() => handlePageChange(page + 1)}
         >
-          Next
+          Pas
         </button>
       </div>
     </div>

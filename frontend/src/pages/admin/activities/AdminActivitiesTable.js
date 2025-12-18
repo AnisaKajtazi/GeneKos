@@ -23,7 +23,7 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
         {activities.length === 0 && (
           <tr>
             <td colSpan="7" className="admin-table-empty">
-              No activities found
+              Nuk u gjet asnjë aktivitet
             </td>
           </tr>
         )}
@@ -59,7 +59,7 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
                 onClick={() => onEdit(a)}
                 title="Edit Activity"
               >
-                Edit
+                Përditëso
               </button>
 
               <button
@@ -67,7 +67,7 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
                 onClick={() => onDelete(a.id)}
                 title="Delete Activity"
               >
-                Delete
+                Fshij
               </button>
             </td>
           </tr>

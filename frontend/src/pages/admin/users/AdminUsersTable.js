@@ -8,16 +8,16 @@ const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
       <thead>
         <tr>
           <th>ID</th>
-          <th>First</th>
-          <th>Last</th>
+          <th>Emri</th>
+          <th>Mbiemri</th>
           <th>Username</th>
           <th>Email</th>
-          <th>Role</th>
-          <th>Phone</th>
-          <th>Gender</th>
-          <th>Date of Birth</th>
-          <th>Address</th>
-          <th>Active</th>
+          <th>Roli</th>
+          <th>Nr. Tel</th>
+          <th>Gjinia</th>
+          <th>Data e Lindjes</th>
+          <th>Adresa</th>
+          <th>Statusi</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -25,7 +25,7 @@ const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
         {users.length === 0 && (
           <tr>
             <td colSpan="12" className="admin-table-empty">
-              No users found
+              Nuk u gjet asnjë User
             </td>
           </tr>
         )}
@@ -45,10 +45,10 @@ const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
             <td>{u.is_active ? "Yes" : "No"}</td>
             <td className="admin-actions-cell">
               <button className="admin-btn success" onClick={() => onEdit(u)}>
-                Edit
+                Perditëso
               </button>
               <button className="admin-btn danger" onClick={() => onDelete(u.id)}>
-                Delete
+                Fshij
               </button>
             </td>
           </tr>

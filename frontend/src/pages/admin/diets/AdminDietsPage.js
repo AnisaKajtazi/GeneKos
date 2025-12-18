@@ -117,7 +117,7 @@ const AdminDietsPage = () => {
           />
           {!showForm && (
             <button className="admin-btn primary" onClick={handleCreate}>
-              Create Diet
+              Krijo Dietë
             </button>
           )}
         </div>
@@ -144,17 +144,17 @@ const AdminDietsPage = () => {
           disabled={page === 1}
           onClick={() => handlePageChange(page - 1)}
         >
-          Previous
+          Para
         </button>
         <span>
-          Page {page} of {totalPages}
+          Faqja {page} nga {totalPages}
         </span>
         <button
           className="admin-btn"
           disabled={page === totalPages}
           onClick={() => handlePageChange(page + 1)}
         >
-          Next
+          Pas
         </button>
       </div>
     </div>

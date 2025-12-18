@@ -56,7 +56,7 @@ const AdminUserForm = ({ editingUser, onSave, onCancel }) => {
 
       <div className="admin-form-grid">
         <div className="admin-form-group">
-          <label>First Name:</label>
+          <label>Emri:</label>
           <input
             name="first_name"
             value={form.first_name}
@@ -66,7 +66,7 @@ const AdminUserForm = ({ editingUser, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Last Name:</label>
+          <label>Mbiemri:</label>
           <input
             name="last_name"
             value={form.last_name}
@@ -108,7 +108,7 @@ const AdminUserForm = ({ editingUser, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Role:</label>
+          <label>Roli:</label>
           <select name="role" value={form.role} onChange={handleChange}>
             <option value="user">User</option>
             <option value="clinic">Clinic</option>
@@ -117,33 +117,33 @@ const AdminUserForm = ({ editingUser, onSave, onCancel }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Phone:</label>
+          <label>Nr. Tel:</label>
           <input name="phone" value={form.phone} onChange={handleChange} />
         </div>
 
         <div className="admin-form-group">
-          <label>Gender:</label>
+          <label>Gjinia:</label>
           <select name="gender" value={form.gender} onChange={handleChange}>
-            <option value="">-- Gender --</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
+            <option value="">-- Gjinia --</option>
+            <option value="male">Mashkull</option>
+            <option value="female">Femër</option>
+            <option value="other">Tjetër</option>
           </select>
         </div>
 
         <div className="admin-form-group">
-          <label>Date of Birth:</label>
+          <label>Data e Lindjes:</label>
           <input type="date" name="date_of_birth" value={form.date_of_birth} onChange={handleChange} />
         </div>
 
         <div className="admin-form-group full">
-          <label>Address:</label>
+          <label>Adresa:</label>
           <input name="address" value={form.address} onChange={handleChange} />
         </div>
 
         <div className="admin-form-group full">
           <label>
-            Active:
+            Statusi:
             <input
               type="checkbox"
               name="is_active"
