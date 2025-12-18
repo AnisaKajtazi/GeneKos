@@ -71,7 +71,7 @@ const ClinicUserForm = ({ editingUser, onSave, onCancel }) => {
       <form onSubmit={handleSubmit}>
         <div className="form-grid">
           <div className="form-group">
-            <label htmlFor="first_name" className="required">First Name</label>
+            <label htmlFor="first_name" className="required">Emri</label>
             <input
               id="first_name"
               name="first_name"
@@ -84,7 +84,7 @@ const ClinicUserForm = ({ editingUser, onSave, onCancel }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="last_name" className="required">Last Name</label>
+            <label htmlFor="last_name" className="required">Mbiemri</label>
             <input
               id="last_name"
               name="last_name"
@@ -139,7 +139,7 @@ const ClinicUserForm = ({ editingUser, onSave, onCancel }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phone">Phone Number</label>
+            <label htmlFor="phone">Nr. Tel</label>
             <input
               id="phone"
               name="phone"
@@ -151,22 +151,22 @@ const ClinicUserForm = ({ editingUser, onSave, onCancel }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="gender">Gender</label>
+            <label htmlFor="gender">Gjinia</label>
             <select
               id="gender"
               name="gender"
               value={form.gender}
               onChange={handleChange}
             >
-              <option value="">Select gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="">Selekto Gjininë</option>
+              <option value="male">Mashkull</option>
+              <option value="female">Femër</option>
+              <option value="other">Tjetër</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="date_of_birth">Date of Birth</label>
+            <label htmlFor="date_of_birth">Data e Lindjes</label>
             <input
               id="date_of_birth"
               name="date_of_birth"
@@ -177,7 +177,7 @@ const ClinicUserForm = ({ editingUser, onSave, onCancel }) => {
           </div>
 
           <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-            <label htmlFor="address">Address</label>
+            <label htmlFor="address">Adresa</label>
             <textarea
               id="address"
               name="address"
@@ -197,7 +197,7 @@ const ClinicUserForm = ({ editingUser, onSave, onCancel }) => {
             checked={form.is_active}
             onChange={handleChange}
           />
-          <label htmlFor="is_active">Patient is active</label>
+          <label htmlFor="is_active">Pacienti është aktiv</label>
         </div>
 
         <div className="form-actions">

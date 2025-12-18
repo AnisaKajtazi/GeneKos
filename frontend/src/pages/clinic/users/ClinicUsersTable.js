@@ -6,7 +6,7 @@ const ClinicUsersTable = ({ users, loading, onEdit, onDelete }) => {
       <div className="clinic-users-table-container">
         <div className="loading-state">
           <div className="loading-spinner"></div>
-          <p>Loading patients...</p>
+          <p>Loading pacientët...</p>
         </div>
       </div>
     );
@@ -22,9 +22,9 @@ const ClinicUsersTable = ({ users, loading, onEdit, onDelete }) => {
               <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
-          <h4 className="empty-title">No Patients Found</h4>
+          <h4 className="empty-title">Nuk u gjet asnjë pacient</h4>
           <p className="empty-message">
-            No patients are registered yet. Click "Add Patient" to create your first patient record.
+            Asnjë pacient nuk është i regjistruar deri tani. Kliko "Shto Pacient" për ta krijuar pacientin tënd të parë.
           </p>
         </div>
       </div>
@@ -56,15 +56,15 @@ const ClinicUsersTable = ({ users, loading, onEdit, onDelete }) => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
+              <th>Emri</th>
+              <th>Mbiemri</th>
               <th>Username</th>
               <th>Email</th>
-              <th>Phone</th>
-              <th>Gender</th>
-              <th>Date of Birth</th>
-              <th>Address</th>
-              <th>Active</th>
+              <th>Nr. Tel</th>
+              <th>Gjinia</th>
+              <th>Data e Lindjes</th>
+              <th>Adresa</th>
+              <th>Statusi</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -103,7 +103,7 @@ const ClinicUsersTable = ({ users, loading, onEdit, onDelete }) => {
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                       </svg>
-                      Edit
+                      Përditëso
                     </button>
                     <button
                       type="button"
@@ -117,7 +117,7 @@ const ClinicUsersTable = ({ users, loading, onEdit, onDelete }) => {
                         <line x1="10" y1="11" x2="10" y2="17" />
                         <line x1="14" y1="11" x2="14" y2="17" />
                       </svg>
-                      Delete
+                      Fshij
                     </button>
                   </div>
                 </td>

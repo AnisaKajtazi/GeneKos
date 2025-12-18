@@ -12,7 +12,7 @@ const MyAppointmentsList = ({ appointments }) => {
         borderRadius: '10px',
         color: '#6c757d'
       }}>
-        <p style={{ margin: 0, fontSize: '1.1rem' }}>No appointments yet.</p>
+        <p style={{ margin: 0, fontSize: '1.1rem' }}>Nuk ka Termine deri tani.</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ const MyAppointmentsList = ({ appointments }) => {
               fontSize: '0.9rem',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
-            }}>Date & Time</th>
+            }}>Data & Ora</th>
             <th style={{
               padding: '1rem',
               textAlign: 'left',
@@ -50,7 +50,7 @@ const MyAppointmentsList = ({ appointments }) => {
               fontSize: '0.9rem',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
-            }}>Status</th>
+            }}>Statusi</th>
             <th style={{
               padding: '1rem',
               textAlign: 'left',
@@ -58,7 +58,7 @@ const MyAppointmentsList = ({ appointments }) => {
               fontSize: '0.9rem',
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
-            }}>Note</th>
+            }}>Shënimet</th>
           </tr>
         </thead>
         <tbody>
@@ -402,7 +402,7 @@ const UserAppointmentsPage = () => {
                 color: '#ef4444',
                 marginTop: '0.5rem'
               }}>
-                Nuk ka slot-e të lira për këtë datë
+                Nuk ka termine të lira për këtë datë
               </p>
             )}
           </div>
@@ -551,7 +551,7 @@ const UserAppointmentsPage = () => {
             }}>
               <span>✅</span>
               <span>
-                Ka <strong>{availableSlots.length}</strong> slot-e të lira për {selectedDate}
+                Ka <strong>{availableSlots.length}</strong> termine të lira për {selectedDate}
               </span>
             </p>
           </div>

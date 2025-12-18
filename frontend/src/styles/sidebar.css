@@ -30,6 +30,7 @@
   top: 0;
   border-right: 1px solid var(--border-color);
   box-shadow: 2px 0 25px rgba(0, 0, 0, 0.15);
+  overflow-y: auto;
 }
 
 .logo {
@@ -125,7 +126,7 @@
 
 .logout-btn {
   margin: 2rem;
-  margin-top: auto;
+  margin-top: 10%;
   padding: 1rem 1.5rem; 
   background: transparent;
   color: #9ca3af;
@@ -139,6 +140,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  margin-bottom: 30%;
 }
 
 .logout-btn:hover {

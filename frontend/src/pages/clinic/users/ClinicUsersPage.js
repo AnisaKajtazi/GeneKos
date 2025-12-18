@@ -114,10 +114,10 @@ const filteredUsers = clinicUsers.filter((user) => {
   return (
     <div className="clinic-users-page">
       <div className="page-header">
-        <h1>Patient Management</h1>
+        <h1>Menaxhimi i Pacientëve</h1>
         <p className="page-subtitle">
-          Manage all your clinic's patients in one place. Add new patients, update existing records, 
-          or search for specific patients.
+          Menaxho të gjithë pacientët e klinikës tënde në një vend. 
+          Shto pacientë të rinj, përditëso të dhënat ekzistuese, ose kërko për pacientë të veçantë.
         </p>
       </div>
 
@@ -144,7 +144,7 @@ const filteredUsers = clinicUsers.filter((user) => {
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Add New Patient
+            Shto Pacient
           </button>
         )}
       </div>
@@ -152,7 +152,7 @@ const filteredUsers = clinicUsers.filter((user) => {
       <div className="stats-card">
         <div className="stats-indicator"></div>
         <p className="stats-text">
-          Showing <strong>{filteredUsers.length}</strong> of <strong>{totalUsers}</strong> patient{totalUsers !== 1 ? 's' : ''}
+          Duke treguar <strong>{filteredUsers.length}</strong> nga <strong>{totalUsers}</strong> pacientë
           {searchTerm && ` matching "${searchTerm}"`}
         </p>
       </div>
@@ -188,13 +188,13 @@ const filteredUsers = clinicUsers.filter((user) => {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-            Previous
+            Para
           </button>
 
           <div className="pagination-info">
-            <span>Page</span>
+            <span>Faqja</span>
             <span className="pagination-current">{page}</span>
-            <span>of {totalPages}</span>
+            <span>nga {totalPages}</span>
           </div>
 
           <button
@@ -202,7 +202,7 @@ const filteredUsers = clinicUsers.filter((user) => {
             onClick={() => fetchUsers(page + 1, searchTerm)}
             disabled={page === totalPages}
           >
-            Next
+            Pas
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <polyline points="9 18 15 12 9 6" />
             </svg>
