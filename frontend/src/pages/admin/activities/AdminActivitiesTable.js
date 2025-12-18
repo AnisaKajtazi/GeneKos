@@ -1,27 +1,29 @@
 import React from "react";
 
 const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return <p className="admin-loading">Loading...</p>;
+  }
 
   return (
-    <table border="1" style={{ borderCollapse: "collapse", width: "100%" }}>
+    <table className="admin-table">
       <thead>
-        <tr style={{ backgroundColor: "#f2f2f2" }}>
+        <tr>
           <th>ID</th>
           <th>User</th>
           <th>Appointment Request</th>
           <th>Activity Plan</th>
           <th>Analysis ID</th>
           <th>Created At</th>
-          <th>Actions</th>
+          <th className="admin-center">Actions</th>
         </tr>
       </thead>
 
       <tbody>
         {activities.length === 0 && (
           <tr>
-            <td colSpan="7" style={{ textAlign: "center" }}>
-              No activities found
+            <td colSpan="7" className="admin-table-empty">
+              Nuk u gjet asnjë aktivitet
             </td>
           </tr>
         )}
@@ -30,56 +32,42 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
           <tr key={a.id}>
             <td>{a.id}</td>
 
-            <td>
-              {a.User
-                ? `${a.User.first_name} ${a.User.last_name}`
-                : "-"}
-            </td>
+            <td>{a.User ? `${a.User.first_name} ${a.User.last_name}` : "-"}</td>
 
             <td>
-              {a.AppointmentRequest
-                ? `Appointment ${a.AppointmentRequest.id} - ${new Date(
-                    a.AppointmentRequest.scheduled_date
-                  ).toLocaleString()}`
-                : "-"}
+              {a.AppointmentRequest ? (
+                <>
+                  <strong>#{a.AppointmentRequest.id}</strong>
+                  <br />
+                  <span style={{ color: "#6c757d", fontSize: "12px" }}>
+                    {new Date(a.AppointmentRequest.scheduled_date).toLocaleString()}
+                  </span>
+                </>
+              ) : (
+                "-"
+              )}
             </td>
 
             <td>{a.activity_plan || "-"}</td>
             <td>{a.analysis_id || "-"}</td>
-            <td>
-              {a.created_at
-                ? new Date(a.created_at).toLocaleString()
-                : "-"}
-            </td>
 
-            <td>
+            <td>{a.created_at ? new Date(a.created_at).toLocaleString() : "-"}</td>
+
+            <td className="admin-actions-cell">
               <button
+                className="admin-btn success"
                 onClick={() => onEdit(a)}
-                style={{
-                  marginRight: "5px",
-                  padding: "4px 8px",
-                  backgroundColor: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "3px",
-                  cursor: "pointer",
-                }}
+                title="Edit Activity"
               >
-                Edit
+                Përditëso
               </button>
 
               <button
+                className="admin-btn danger"
                 onClick={() => onDelete(a.id)}
-                style={{
-                  padding: "4px 8px",
-                  backgroundColor: "#f44336",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "3px",
-                  cursor: "pointer",
-                }}
+                title="Delete Activity"
               >
-                Delete
+                Fshij
               </button>
             </td>
           </tr>

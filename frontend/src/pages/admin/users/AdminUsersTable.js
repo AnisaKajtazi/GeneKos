@@ -1,35 +1,36 @@
+import React from "react";
+
 const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div className="admin-loading">Loading...</div>;
 
   return (
-    <table border="1" style={{ borderCollapse: 'collapse', width: '100%' }}>
+    <table className="admin-table">
       <thead>
         <tr>
           <th>ID</th>
-          <th>First</th>
-          <th>Last</th>
+          <th>Emri</th>
+          <th>Mbiemri</th>
           <th>Username</th>
           <th>Email</th>
-          <th>Role</th>
-          <th>Phone</th>
-          <th>Gender</th>
-          <th>Date of Birth</th>
-          <th>Address</th>
-          <th>Active</th>
+          <th>Roli</th>
+          <th>Nr. Tel</th>
+          <th>Gjinia</th>
+          <th>Data e Lindjes</th>
+          <th>Adresa</th>
+          <th>Statusi</th>
           <th>Actions</th>
         </tr>
       </thead>
-
       <tbody>
         {users.length === 0 && (
           <tr>
-            <td colSpan="12" style={{ textAlign: 'center' }}>
-              No users found
+            <td colSpan="12" className="admin-table-empty">
+              Nuk u gjet asnjë User
             </td>
           </tr>
         )}
 
-        {users.map(u => (
+        {users.map((u) => (
           <tr key={u.id}>
             <td>{u.id}</td>
             <td>{u.first_name}</td>
@@ -37,14 +38,18 @@ const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
             <td>{u.username}</td>
             <td>{u.email}</td>
             <td>{u.role}</td>
-            <td>{u.phone || '-'}</td>
-            <td>{u.gender || '-'}</td>
-            <td>{u.date_of_birth || '-'}</td>
-            <td>{u.address || '-'}</td>
-            <td>{u.is_active ? 'Yes' : 'No'}</td>
-            <td>
-              <button onClick={() => onEdit(u)}>Edit</button>{' '}
-              <button onClick={() => onDelete(u.id)}>Delete</button>
+            <td>{u.phone || "-"}</td>
+            <td>{u.gender || "-"}</td>
+            <td>{u.date_of_birth || "-"}</td>
+            <td>{u.address || "-"}</td>
+            <td>{u.is_active ? "Yes" : "No"}</td>
+            <td className="admin-actions-cell">
+              <button className="admin-btn success" onClick={() => onEdit(u)}>
+                Perditëso
+              </button>
+              <button className="admin-btn danger" onClick={() => onDelete(u.id)}>
+                Fshij
+              </button>
             </td>
           </tr>
         ))}

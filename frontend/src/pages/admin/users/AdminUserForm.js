@@ -25,7 +25,7 @@ const AdminUserForm = ({ editingUser, onSave, onCancel }) => {
         username: editingUser.username || '',
         email: '', 
         password: '',
-        role: 'user', 
+        role: editingUser.role || 'user', 
         phone: editingUser.phone || '',
         gender: editingUser.gender || '',
         date_of_birth: editingUser.date_of_birth || '',
@@ -48,109 +48,118 @@ const AdminUserForm = ({ editingUser, onSave, onCancel }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(form);
-    if (!editingUser) setForm({ ...emptyForm });
-  };
-
-  const handleCancel = () => {
-    setForm({ ...emptyForm });
-    if (onCancel) onCancel();
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
-      <h3>{editingUser ? 'Edit User' : 'Create User'}</h3>
+    <form onSubmit={handleSubmit} className="admin-form">
+      <h3 className="admin-form-title">{editingUser ? 'Edit User' : 'Create User'}</h3>
 
-      <input
-        name="first_name"
-        placeholder="First name"
-        value={form.first_name}
-        onChange={handleChange}
-        required
-      />
+      <div className="admin-form-grid">
+        <div className="admin-form-group">
+          <label>Emri:</label>
+          <input
+            name="first_name"
+            value={form.first_name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        name="last_name"
-        placeholder="Last name"
-        value={form.last_name}
-        onChange={handleChange}
-        required
-      />
+        <div className="admin-form-group">
+          <label>Mbiemri:</label>
+          <input
+            name="last_name"
+            value={form.last_name}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        name="username"
-        placeholder="Username"
-        value={form.username}
-        onChange={handleChange}
-        required
-        autoComplete="new-username"
-      />
+        <div className="admin-form-group">
+          <label>Username:</label>
+          <input
+            name="username"
+            value={form.username}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        name="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={handleChange}
-        required
-        autoComplete="new-email"
-      />
+        <div className="admin-form-group">
+          <label>Email:</label>
+          <input
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-      <input
-        type="password"
-        name="password"
-        placeholder={editingUser ? 'New password (optional)' : 'Password'}
-        value={form.password}
-        onChange={handleChange}
-        required={!editingUser}
-        autoComplete="new-password"
-      />
+        <div className="admin-form-group">
+          <label>Password:</label>
+          <input
+            type="password"
+            name="password"
+            placeholder={editingUser ? 'New password (optional)' : 'Password'}
+            value={form.password}
+            onChange={handleChange}
+            required={!editingUser}
+          />
+        </div>
 
-      <select name="role" value={form.role} onChange={handleChange}>
-        <option value="user">User</option>
-        <option value="clinic">Clinic</option>
-        <option value="admin">Admin</option>
-      </select>
+        <div className="admin-form-group">
+          <label>Roli:</label>
+          <select name="role" value={form.role} onChange={handleChange}>
+            <option value="user">User</option>
+            <option value="clinic">Clinic</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
 
-      <input
-        name="phone"
-        placeholder="Phone"
-        value={form.phone}
-        onChange={handleChange}
-      />
+        <div className="admin-form-group">
+          <label>Nr. Tel:</label>
+          <input name="phone" value={form.phone} onChange={handleChange} />
+        </div>
 
-      <select name="gender" value={form.gender} onChange={handleChange}>
-        <option value="">-- Gender --</option>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-        <option value="other">Other</option>
-      </select>
+        <div className="admin-form-group">
+          <label>Gjinia:</label>
+          <select name="gender" value={form.gender} onChange={handleChange}>
+            <option value="">-- Gjinia --</option>
+            <option value="male">Mashkull</option>
+            <option value="female">Femër</option>
+            <option value="other">Tjetër</option>
+          </select>
+        </div>
 
-      <input
-        type="date"
-        name="date_of_birth"
-        value={form.date_of_birth}
-        onChange={handleChange}
-      />
+        <div className="admin-form-group">
+          <label>Data e Lindjes:</label>
+          <input type="date" name="date_of_birth" value={form.date_of_birth} onChange={handleChange} />
+        </div>
 
-      <input
-        name="address"
-        placeholder="Address"
-        value={form.address}
-        onChange={handleChange}
-      />
+        <div className="admin-form-group full">
+          <label>Adresa:</label>
+          <input name="address" value={form.address} onChange={handleChange} />
+        </div>
 
-      <label>
-        Active:
-        <input
-          type="checkbox"
-          name="is_active"
-          checked={form.is_active}
-          onChange={handleChange}
-        />
-      </label>
+        <div className="admin-form-group full">
+          <label>
+            Statusi:
+            <input
+              type="checkbox"
+              name="is_active"
+              checked={form.is_active}
+              onChange={handleChange}
+              style={{ marginLeft: '5px' }}
+            />
+          </label>
+        </div>
+      </div>
 
-      <div style={{ marginTop: '10px' }}>
-        <button type="submit">{editingUser ? 'Update' : 'Create'}</button>
-        <button type="button" onClick={handleCancel} style={{ marginLeft: '10px' }}>
+      <div className="admin-form-actions">
+        <button type="submit" className="admin-btn primary">
+          {editingUser ? 'Update' : 'Create'}
+        </button>
+        <button type="button" className="admin-btn secondary" onClick={onCancel}>
           Cancel
         </button>
       </div>

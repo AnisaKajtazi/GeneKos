@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+
 import AdminActivitiesTable from './AdminActivitiesTable';
 import AdminActivityForm from './AdminActivityForm';
 
@@ -12,14 +13,15 @@ const AdminActivitiesPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
-  const limit = 10;
 
+  const limit = 10;
   const token = localStorage.getItem('token');
   const debounceRef = useRef(null);
 
   const fetchActivities = async (pageNumber = 1, search = '') => {
     try {
       setLoading(true);
+
       const res = await axios.get(
         `http://localhost:5000/api/admin/activities?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(search)}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -29,8 +31,8 @@ const AdminActivitiesPage = () => {
       setPage(res.data.page || 1);
       setTotalPages(res.data.totalPages || 1);
     } catch (err) {
-      console.error("Gabim në marrjen e aktiviteteve:", err);
-      alert("Gabim në marrjen e aktiviteteve");
+      console.error('Gabim në marrjen e aktiviteteve:', err);
+      alert('Gabim në marrjen e aktiviteteve');
     } finally {
       setLoading(false);
     }
@@ -61,12 +63,13 @@ const AdminActivitiesPage = () => {
       fetchActivities(page, searchTerm);
     } catch (err) {
       console.error(err);
-      alert("Gabim gjatë ruajtjes së aktivitetit");
+      alert('Gabim gjatë ruajtjes së aktivitetit');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("A je i sigurt?")) return;
+    if (!window.confirm('A je i sigurt?')) return;
+
     try {
       await axios.delete(
         `http://localhost:5000/api/admin/activities/${id}`,
@@ -75,7 +78,7 @@ const AdminActivitiesPage = () => {
       fetchActivities(page, searchTerm);
     } catch (err) {
       console.error(err);
-      alert("Gabim gjatë fshirjes së aktivitetit");
+      alert('Gabim gjatë fshirjes së aktivitetit');
     }
   };
 
@@ -106,62 +109,75 @@ const AdminActivitiesPage = () => {
   };
 
   return (
-    <div>
-      <h1>Aktivitetet</h1>
+    <div className="admin-page">
 
-      <input
-        type="text"
-        placeholder="Kërko aktivitet..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ marginBottom: '10px', marginRight: '5px' }}
-      />
+      <div className="admin-header">
+        <h1>Aktivitetet</h1>
 
-      {!showForm && (
-        <button
-          onClick={() => setShowForm(true)}
-          style={{
-            marginBottom: "10px",
-            padding: "6px 12px",
-            backgroundColor: "#2196F3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Create Activity
-        </button>
-      )}
+        <div className="admin-actions">
+          <input
+            type="text"
+            className="admin-search"
+            placeholder="Kërko aktivitet..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+
+          {!showForm && (
+            <button
+              className="admin-btn primary"
+              onClick={() => setShowForm(true)}
+            >
+              Krijo Aktivitet
+            </button>
+          )}
+        </div>
+      </div>
+
 
       {showForm && (
-        <AdminActivityForm
-          editingActivity={editingActivity}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
+        <div className="admin-card">
+          <AdminActivityForm
+            editingActivity={editingActivity}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+        </div>
       )}
 
-      <AdminActivitiesTable
-        activities={activities}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
 
-      <div style={{ marginTop: '10px' }}>
-        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-          Previous
+      <div className="admin-card">
+        <AdminActivitiesTable
+          activities={activities}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
+
+
+      <div className="admin-pagination">
+        <button
+          className="admin-btn"
+          disabled={page === 1}
+          onClick={() => handlePageChange(page - 1)}
+        >
+          Para
         </button>
 
-        <span style={{ margin: '0 10px' }}>
-          Page {page} of {totalPages}
+        <span>
+          Faqja {page} nga {totalPages}
         </span>
 
-        <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
-          Next
+        <button
+          className="admin-btn"
+          disabled={page === totalPages}
+          onClick={() => handlePageChange(page + 1)}
+        >
+          Pas
         </button>
       </div>
+
     </div>
   );
 };

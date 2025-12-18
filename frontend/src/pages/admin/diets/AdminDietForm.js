@@ -82,60 +82,58 @@ const AdminDietForm = ({ editingDiet, onSave, onCancel }) => {
   };
 
   return (
-    <form onSubmit={submit} style={{ marginBottom: "20px" }}>
-      <h3>{editingDiet ? "Edit Diet" : "Create Diet"}</h3>
+    <form onSubmit={submit} className="admin-form">
+      <h3 className="admin-form-title">{editingDiet ? "Edit Diet" : "Create Diet"}</h3>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>User:</label>
-        <select
-          name="user_id"
-          value={form.user_id}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Select User --</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.first_name} {u.last_name}
-            </option>
-          ))}
-        </select>
+      <div className="admin-form-grid">
+        <div className="admin-form-group">
+          <label>User:</label>
+          <select name="user_id" value={form.user_id} onChange={handleChange} required>
+            <option value="">-- Selekto Userin --</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.first_name} {u.last_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="admin-form-group">
+          <label>Kërkesa për Termin:</label>
+          <select
+            name="request_id"
+            value={form.request_id || ""}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Selekto Terminin e Kryer --</option>
+            {requests.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="admin-form-group full">
+          <label>Plani i Dietës:</label>
+          <textarea
+            name="diet_plan"
+            placeholder="Diet plan"
+            value={form.diet_plan}
+            onChange={handleChange}
+            required
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>Appointment Request:</label>
-        <select
-          name="request_id"
-          value={form.request_id || ""}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Select Completed Appointment --</option>
-          {requests.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label>Diet Plan:</label>
-        <textarea
-          name="diet_plan"
-          placeholder="Diet plan"
-          value={form.diet_plan}
-          onChange={handleChange}
-          required
-          style={{ width: "100%", minHeight: "60px" }}
-        />
-      </div>
-
-      <div style={{ marginTop: "10px" }}>
-        <button type="submit" style={{ marginRight: "10px" }}>
+      <div className="admin-form-actions">
+        <button type="submit" className="admin-btn primary">
           {editingDiet ? "Update" : "Create"}
         </button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+        <button type="button" className="admin-btn secondary" onClick={onCancel}>
+          Cancel
+        </button>
       </div>
     </form>
   );

@@ -57,32 +57,32 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
   };
 
   useEffect(() => {
-  const loadEditingData = async () => {
-    if (editingResult && users.length > 0) {
-      const user_id = editingResult.AppointmentRequest?.user_id || "";
-      const request_id = editingResult.request_id || "";
-      const analysis_type = editingResult.analysis_type || "";
+    const loadEditingData = async () => {
+      if (editingResult && users.length > 0) {
+        const user_id = editingResult.AppointmentRequest?.user_id || "";
+        const request_id = editingResult.request_id || "";
+        const analysis_type = editingResult.analysis_type || "";
 
-      const fetchedRequests = await fetchRequestsForUser(user_id);
+        const fetchedRequests = await fetchRequestsForUser(user_id);
 
-      const validRequestId = fetchedRequests.some((r) => r.id === request_id)
-        ? request_id
-        : "";
+        const validRequestId = fetchedRequests.some((r) => r.id === request_id)
+          ? request_id
+          : "";
 
-      setForm({
-        user_id,
-        request_id: validRequestId,
-        analysis_type,
-        pdf: null,
-      });
-    } else if (!editingResult) {
-      setForm(emptyForm);
-      setRequests([]);
-    }
-  };
+        setForm({
+          user_id,
+          request_id: validRequestId,
+          analysis_type,
+          pdf: null,
+        });
+      } else if (!editingResult) {
+        setForm(emptyForm);
+        setRequests([]);
+      }
+    };
 
-  loadEditingData();
-}, [editingResult, users]);
+    loadEditingData();
+  }, [editingResult, users]);
 
   useEffect(() => {
     if (!editingResult) {
@@ -102,77 +102,87 @@ const AdminAnalysisResultForm = ({ editingResult, onSave, onCancel }) => {
     }
   };
 
-  const submit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     onSave(form);
+    if (!editingResult) setForm(emptyForm);
+  };
+
+  const handleCancel = () => {
+    setForm(emptyForm);
+    if (onCancel) onCancel();
   };
 
   return (
-    <form onSubmit={submit} style={{ marginBottom: "20px" }}>
-      <h3>{editingResult ? "Edit Analysis" : "Upload Analysis"}</h3>
+    <form onSubmit={handleSubmit} className="admin-form" style={{ marginBottom: "20px" }}>
+      <h3 className="admin-form-title">{editingResult ? "Edit Analysis" : "Upload Analysis"}</h3>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>User:</label>
-        <select
-          name="user_id"
-          value={form.user_id}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Zgjedh Përdoruesin --</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.first_name} {u.last_name}
-            </option>
-          ))}
-        </select>
+      <div className="admin-form-grid">
+        <div className="admin-form-group">
+          <label>User:</label>
+          <select
+            name="user_id"
+            value={form.user_id}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Zgjedh Përdoruesin --</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.first_name} {u.last_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="admin-form-group">
+          <label>Takimi i përfunduar:</label>
+          <select
+            name="request_id"
+            value={form.request_id || ""}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Zgjedh Takimin --</option>
+            {requests.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="admin-form-group">
+          <label>Lloji i Analizës:</label>
+          <input
+            type="text"
+            name="analysis_type"
+            value={form.analysis_type}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="admin-form-group">
+          <label>PDF:</label>
+          <input
+            type="file"
+            name="pdf"
+            accept="application/pdf"
+            onChange={handleChange}
+            required={!editingResult}
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>Takimi i përfunduar:</label>
-        <select
-          name="request_id"
-          value={form.request_id || ""}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Zgjedh Takimin --</option>
-          {requests.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
+      <div className="admin-form-actions">
+        <button type="submit" className="admin-btn primary">
+          {editingResult ? "Update" : "Upload"}
+        </button>
+        <button type="button" className="admin-btn secondary" onClick={handleCancel}>
+          Cancel
+        </button>
       </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label>Lloji i Analizës:</label>
-        <input
-          type="text"
-          name="analysis_type"
-          value={form.analysis_type}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label>PDF:</label>
-        <input
-          type="file"
-          name="pdf"
-          accept="application/pdf"
-          onChange={handleChange}
-          required={!editingResult}
-        />
-      </div>
-
-      <button type="submit" style={{ marginRight: "10px" }}>
-        {editingResult ? "Update" : "Upload"}
-      </button>
-      <button type="button" onClick={onCancel}>
-        Cancel
-      </button>
     </form>
   );
 };

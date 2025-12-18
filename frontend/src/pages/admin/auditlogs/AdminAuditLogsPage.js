@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
-import AdminAuditLogsTable from './AdminAuditLogsTable';
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
+import AdminAuditLogsTable from "./AdminAuditLogsTable";
 
 const AdminAuditLogsPage = () => {
   const [logs, setLogs] = useState([]);
@@ -8,13 +8,13 @@ const AdminAuditLogsPage = () => {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const limit = 10;
 
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
   const debounceRef = useRef(null);
 
-  const fetchLogs = async (pageNumber = 1, search = '') => {
+  const fetchLogs = async (pageNumber = 1, search = "") => {
     try {
       setLoading(true);
       const res = await axios.get(
@@ -69,34 +69,47 @@ const AdminAuditLogsPage = () => {
   };
 
   return (
-    <div>
-      <h1>Audit Logs</h1>
+    <div className="admin-page">
+      <div className="admin-header">
+        <h1>Audit Logs</h1>
+        <div className="admin-actions">
+          <input
+            type="text"
+            className="admin-search"
+            placeholder="Kërko audit logs..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
+      </div>
 
-      <input
-        type="text"
-        placeholder="Kërko audit logs..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ marginBottom: '10px', marginRight: '5px' }}
-      />
+      <div className="admin-card">
+        <AdminAuditLogsTable
+          logs={Array.isArray(logs) ? logs : []}
+          loading={loading}
+          onDelete={handleDelete}
+        />
+      </div>
 
-      <AdminAuditLogsTable
-        logs={Array.isArray(logs) ? logs : []}
-        loading={loading}
-        onDelete={handleDelete}
-      />
-
-      <div style={{ marginTop: '10px' }}>
-        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-          Previous
+      <div className="admin-pagination">
+        <button
+          className="admin-btn"
+          disabled={page === 1}
+          onClick={() => handlePageChange(page - 1)}
+        >
+          Para
         </button>
 
-        <span style={{ margin: '0 10px' }}>
-          Page {page} of {totalPages}
+        <span>
+          Faqja {page} nga {totalPages}
         </span>
 
-        <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>
-          Next
+        <button
+          className="admin-btn"
+          disabled={page === totalPages}
+          onClick={() => handlePageChange(page + 1)}
+        >
+          Pas
         </button>
       </div>
     </div>

@@ -1,7 +1,9 @@
 import React, { useContext } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext';
+
+import './styles/admin.css';
 
 import Register from './pages/auth/Register';
 import Login from './pages/auth/Login';
@@ -25,15 +27,32 @@ import ActivitiesPage from './pages/client/ActivitiesPage';
 import UserHealthProfileHistory from './pages/client/UserHealthProfileHistory';
 import DietsPage from './pages/client/DietsPage';
 
-
-
-
+// ---- Chat wrapper ----
 const ChatWrapper = () => {
   const { user } = useContext(AuthContext);
   if (!user) return <p>Loading...</p>;
   return <ChatPage currentUser={user} />;
 };
 
+// ---- Role based redirect për dashboard index ----
+const RoleDefaultRedirect = () => {
+  const { user } = useContext(AuthContext);
+
+  if (!user) return <p>Loading...</p>;
+
+  switch (user.role) {
+    case 'user':
+      return <Navigate to="/dashboard/client/health-history" replace />;
+    case 'clinic':
+      return <Navigate to="/dashboard/clinic/appointments" replace />;
+    case 'admin':
+      return <Navigate to="/dashboard/users" replace />;
+    default:
+      return <h2>Zgjidh një opsion nga sidebar-i</h2>;
+  }
+};
+
+// ---- App ----
 function App() {
   return (
     <AuthProvider>
@@ -48,13 +67,15 @@ function App() {
             <Route
               path="/dashboard"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedRoles={['admin', 'user', 'clinic']}>
                   <Dashboard />
                 </ProtectedRoute>
               }
             >
-              <Route index element={<h2>Zgjidh një opsion nga sidebar-i</h2>} />
+              {/* Pjesa e index redirect */}
+              <Route index element={<RoleDefaultRedirect />} />
 
+              {/* Admin routes */}
               <Route
                 path="admin"
                 element={
@@ -63,7 +84,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="users"
                 element={
@@ -72,7 +92,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="analysis"
                 element={
@@ -81,7 +100,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
               <Route
                 path="activities"
                 element={
@@ -90,16 +108,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-
-                <Route
-                  path="diets"
-                  element={
-                    <ProtectedRoute allowedRoles={['admin']}>
-                      <AdminDietsPage />
-                    </ProtectedRoute>
-                  }
-                />
-
+              <Route
+                path="diets"
+                element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDietsPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="audit-logs"
                 element={
@@ -109,15 +125,19 @@ function App() {
                 }
               />
 
+              {/* Client routes */}
               <Route path="client/appointments" element={<UserAppointmentsPage />} />
               <Route path="client/analyses" element={<AnalysesPage />} />
               <Route path="client/activities" element={<ActivitiesPage />} />
               <Route path="client/health-history" element={<UserHealthProfileHistory />} />
               <Route path="client/diets" element={<DietsPage />} />
 
+              {/* Clinic routes */}
               <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
-                <Route path="clinic/patients" element={<ClinicUsersPage />} />
+              <Route path="clinic/patients" element={<ClinicUsersPage />} />
               <Route path="clinic/PatientData" element={<PatientDataPage />} />
+
+              {/* Chat */}
               <Route path="chat" element={<ChatWrapper />} />
 
             </Route>
