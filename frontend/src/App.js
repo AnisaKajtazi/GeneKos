@@ -20,6 +20,11 @@ import AdminAuditLogsPage from './pages/admin/auditlogs/AdminAuditLogsPage';
 import AdminDietsPage from './pages/admin/diets/AdminDietsPage';
 import AdminAnalysisResultsPage from './pages/admin/analysis/AdminAnalysisResultsPage';
 import ClinicUsersPage from './pages/clinic/users/ClinicUsersPage';
+import AnalysesPage from './pages/client/AnalysesPage';
+import ActivitiesPage from './pages/client/ActivitiesPage';
+import DietsPage from './pages/client/DietsPage';
+
+
 
 
 const ChatWrapper = () => {
@@ -104,6 +109,9 @@ function App() {
               />
 
               <Route path="client/appointments" element={<UserAppointmentsPage />} />
+              <Route path="client/analyses" element={<AnalysesPage />} />
+              <Route path="client/activities" element={<ActivitiesPage />} />
+              <Route path="client/diets" element={<DietsPage />} />
 
               <Route path="clinic/appointments" element={<ClinicAppointmentsPage />} />
                 <Route path="clinic/patients" element={<ClinicUsersPage />} />
