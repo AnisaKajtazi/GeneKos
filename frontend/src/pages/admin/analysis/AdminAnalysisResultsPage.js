@@ -21,7 +21,9 @@ const AdminAnalysisResultsPage = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `http://localhost:5000/api/admin/analysis?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        `http://localhost:5000/api/admin/analysis?page=${pageNumber}&limit=${limit}&search=${encodeURIComponent(
+          search
+        )}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -30,6 +32,7 @@ const AdminAnalysisResultsPage = () => {
       setTotalPages(res.data.totalPages || 1);
     } catch (err) {
       console.error("Gabim në marrjen e analizave:", err);
+      alert("Gabim në marrjen e analizave");
     } finally {
       setLoading(false);
     }
@@ -58,21 +61,17 @@ const AdminAnalysisResultsPage = () => {
           }
         );
       } else {
-        await axios.post(
-          "http://localhost:5000/api/admin/analysis",
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await axios.post("http://localhost:5000/api/admin/analysis", formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
       }
 
       setEditingResult(null);
       setShowForm(false);
-      fetchResults(1, searchTerm); // refresh page 1 after save
+      fetchResults(1, searchTerm);
     } catch (err) {
       console.error(err);
       alert("Gabim gjatë ruajtjes së analizës");
@@ -83,10 +82,9 @@ const AdminAnalysisResultsPage = () => {
     if (!window.confirm("A je i sigurt?")) return;
 
     try {
-      await axios.delete(
-        `http://localhost:5000/api/admin/analysis/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`http://localhost:5000/api/admin/analysis/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchResults(page, searchTerm);
     } catch (err) {
       console.error(err);
@@ -130,50 +128,61 @@ const AdminAnalysisResultsPage = () => {
   };
 
   return (
-    <div>
-      <h1>Analizat</h1>
-
-      <input
-        type="text"
-        placeholder="Kërko analizë ose pacient..."
-        value={searchTerm}
-        onChange={handleSearchChange}
-        style={{ marginBottom: "10px", marginRight: "5px" }}
-      />
-
-      {!showForm && (
-        <button onClick={handleCreate} style={{ marginBottom: "10px" }}>
-          Upload Analysis
-        </button>
-      )}
+    <div className="admin-page">
+      <div className="admin-header">
+        <h1>Analizat</h1>
+        <div className="admin-actions">
+          <input
+            type="text"
+            className="admin-search"
+            placeholder="Kërko analizë ose pacient..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {!showForm && (
+            <button className="admin-btn primary" onClick={handleCreate}>
+              Upload Analysis
+            </button>
+          )}
+        </div>
+      </div>
 
       {showForm && (
-        <AdminAnalysisResultForm
-          editingResult={editingResult}
-          onSave={handleSave}
-          onCancel={handleCancel}
-        />
+        <div className="admin-card">
+          <AdminAnalysisResultForm
+            editingResult={editingResult}
+            onSave={handleSave}
+            onCancel={handleCancel}
+          />
+        </div>
       )}
 
-      <AdminAnalysisResultsTable
-        results={Array.isArray(results) ? results : []}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <div className="admin-card">
+        <AdminAnalysisResultsTable
+          results={Array.isArray(results) ? results : []}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
-      <div style={{ marginTop: "10px" }}>
-        <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+      <div className="admin-pagination">
+        <button
+          className="admin-btn"
+          disabled={page === 1}
+          onClick={() => handlePageChange(page - 1)}
+        >
           Previous
         </button>
 
-        <span style={{ margin: "0 10px" }}>
+        <span>
           Page {page} of {totalPages}
         </span>
 
         <button
-          onClick={() => handlePageChange(page + 1)}
+          className="admin-btn"
           disabled={page === totalPages}
+          onClick={() => handlePageChange(page + 1)}
         >
           Next
         </button>

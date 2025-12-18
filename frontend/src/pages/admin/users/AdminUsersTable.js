@@ -1,8 +1,10 @@
+import React from "react";
+
 const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div className="admin-loading">Loading...</div>;
 
   return (
-    <table border="1" style={{ borderCollapse: 'collapse', width: '100%' }}>
+    <table className="admin-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -19,17 +21,16 @@ const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
           <th>Actions</th>
         </tr>
       </thead>
-
       <tbody>
         {users.length === 0 && (
           <tr>
-            <td colSpan="12" style={{ textAlign: 'center' }}>
+            <td colSpan="12" className="admin-table-empty">
               No users found
             </td>
           </tr>
         )}
 
-        {users.map(u => (
+        {users.map((u) => (
           <tr key={u.id}>
             <td>{u.id}</td>
             <td>{u.first_name}</td>
@@ -37,14 +38,18 @@ const AdminUsersTable = ({ users, loading, onEdit, onDelete }) => {
             <td>{u.username}</td>
             <td>{u.email}</td>
             <td>{u.role}</td>
-            <td>{u.phone || '-'}</td>
-            <td>{u.gender || '-'}</td>
-            <td>{u.date_of_birth || '-'}</td>
-            <td>{u.address || '-'}</td>
-            <td>{u.is_active ? 'Yes' : 'No'}</td>
-            <td>
-              <button onClick={() => onEdit(u)}>Edit</button>{' '}
-              <button onClick={() => onDelete(u.id)}>Delete</button>
+            <td>{u.phone || "-"}</td>
+            <td>{u.gender || "-"}</td>
+            <td>{u.date_of_birth || "-"}</td>
+            <td>{u.address || "-"}</td>
+            <td>{u.is_active ? "Yes" : "No"}</td>
+            <td className="admin-actions-cell">
+              <button className="admin-btn success" onClick={() => onEdit(u)}>
+                Edit
+              </button>
+              <button className="admin-btn danger" onClick={() => onDelete(u.id)}>
+                Delete
+              </button>
             </td>
           </tr>
         ))}

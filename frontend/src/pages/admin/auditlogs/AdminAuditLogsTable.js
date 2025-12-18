@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
 
 const AdminAuditLogsTable = ({ logs, loading, onDelete }) => {
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="admin-loading">Loading...</p>;
 
   return (
-    <table border="1" style={{ borderCollapse: 'collapse', width: '100%' }}>
+    <table className="admin-table">
       <thead>
         <tr>
           <th>ID</th>
@@ -22,7 +22,7 @@ const AdminAuditLogsTable = ({ logs, loading, onDelete }) => {
       <tbody>
         {logs.length === 0 && (
           <tr>
-            <td colSpan="9" style={{ textAlign: 'center' }}>
+            <td colSpan="9" className="admin-table-empty">
               No logs found
             </td>
           </tr>
@@ -35,11 +35,13 @@ const AdminAuditLogsTable = ({ logs, loading, onDelete }) => {
             <td>{log.role}</td>
             <td>{log.action}</td>
             <td>{log.entity}</td>
-            <td>{log.entity_id || '-'}</td>
-            <td>{log.description || '-'}</td>
+            <td>{log.entity_id || "-"}</td>
+            <td>{log.description || "-"}</td>
             <td>{new Date(log.created_at).toLocaleString()}</td>
-            <td>
-              <button onClick={() => onDelete(log.id)}>Delete</button>
+            <td className="admin-actions-cell">
+              <button className="admin-btn danger" onClick={() => onDelete(log.id)}>
+                Delete
+              </button>
             </td>
           </tr>
         ))}

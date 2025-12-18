@@ -15,6 +15,7 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
 
   const token = localStorage.getItem("token");
 
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -44,13 +45,16 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const completedAppointments = (res.data.appointments || res.data || []).filter(
-          (r) => r.status === "completed"
-        );
+        const completedAppointments =
+          (res.data.appointments || res.data || []).filter(
+            (r) => r.status === "completed"
+          );
 
         const formattedRequests = completedAppointments.map((r) => ({
           ...r,
-          label: `Appointment ${r.id} - ${new Date(r.scheduled_date).toLocaleString()}`,
+          label: `Appointment ${r.id} - ${new Date(
+            r.scheduled_date
+          ).toLocaleString()}`,
         }));
 
         setRequests(formattedRequests);
@@ -97,74 +101,78 @@ const AdminActivityForm = ({ editingActivity, onSave, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-      <h3>{editingActivity ? "Edit Activity" : "Create Activity"}</h3>
+    <div className="admin-form">
+      <h3 className="admin-form-title">
+        {editingActivity ? "Edit Activity" : "Create Activity"}
+      </h3>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>User:</label>
-        <select
-          name="user_id"
-          value={form.user_id}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Select User --</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.first_name} {u.last_name}
-            </option>
-          ))}
-        </select>
+      <div className="admin-form-grid">
+        <div className="admin-form-group">
+          <label>User:</label>
+          <select
+            name="user_id"
+            value={form.user_id}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Select User --</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.first_name} {u.last_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="admin-form-group">
+          <label>Appointment Request:</label>
+          <select
+            name="request_id"
+            value={form.request_id || ""}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Select Completed Appointment --</option>
+            {requests.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="admin-form-group full">
+          <label>Activity Plan:</label>
+          <textarea
+            name="activity_plan"
+            placeholder="Activity plan"
+            value={form.activity_plan}
+            onChange={handleChange}
+            required
+            style={{ minHeight: "60px" }}
+          />
+        </div>
+
+        <div className="admin-form-group">
+          <label>Analysis ID (optional):</label>
+          <input
+            type="number"
+            name="analysis_id"
+            value={form.analysis_id || ""}
+            onChange={handleChange}
+          />
+        </div>
       </div>
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>Appointment Request:</label>
-        <select
-          name="request_id"
-          value={form.request_id || ""}
-          onChange={handleChange}
-          required
-        >
-          <option value="">-- Select Completed Appointment --</option>
-          {requests.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label>Activity Plan:</label>
-        <textarea
-          name="activity_plan"
-          placeholder="Activity plan"
-          value={form.activity_plan}
-          onChange={handleChange}
-          required
-          style={{ width: "100%", minHeight: "60px" }}
-        />
-      </div>
-
-      <div style={{ marginBottom: "10px" }}>
-        <label>Analysis ID (optional):</label>
-        <input
-          type="number"
-          name="analysis_id"
-          value={form.analysis_id || ""}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div style={{ marginTop: "10px" }}>
-        <button type="submit" style={{ marginRight: "10px" }}>
+      <div className="admin-form-actions">
+        <button type="submit" className="admin-btn primary">
           {editingActivity ? "Update" : "Create"}
         </button>
-        <button type="button" onClick={handleCancel}>
+        <button type="button" className="admin-btn secondary" onClick={handleCancel}>
           Cancel
         </button>
       </div>
-    </form>
+    </div>
   );
 };
 
