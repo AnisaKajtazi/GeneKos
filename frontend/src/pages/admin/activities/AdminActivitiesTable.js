@@ -9,16 +9,18 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
         <tr style={{ backgroundColor: "#f2f2f2" }}>
           <th>ID</th>
           <th>User</th>
-          <th>Request</th>
+          <th>Appointment Request</th>
           <th>Activity Plan</th>
+          <th>Analysis ID</th>
           <th>Created At</th>
           <th>Actions</th>
         </tr>
       </thead>
+
       <tbody>
         {activities.length === 0 && (
           <tr>
-            <td colSpan="6" style={{ textAlign: "center" }}>
+            <td colSpan="7" style={{ textAlign: "center" }}>
               No activities found
             </td>
           </tr>
@@ -28,13 +30,11 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
           <tr key={a.id}>
             <td>{a.id}</td>
 
-
             <td>
               {a.User
                 ? `${a.User.first_name} ${a.User.last_name}`
                 : "-"}
             </td>
-
 
             <td>
               {a.AppointmentRequest
@@ -44,9 +44,13 @@ const AdminActivitiesTable = ({ activities, loading, onEdit, onDelete }) => {
                 : "-"}
             </td>
 
-            <td>{a.activity_plan}</td>
-
-            <td>{new Date(a.created_at).toLocaleString()}</td>
+            <td>{a.activity_plan || "-"}</td>
+            <td>{a.analysis_id || "-"}</td>
+            <td>
+              {a.created_at
+                ? new Date(a.created_at).toLocaleString()
+                : "-"}
+            </td>
 
             <td>
               <button

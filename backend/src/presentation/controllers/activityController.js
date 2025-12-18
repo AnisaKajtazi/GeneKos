@@ -1,3 +1,4 @@
+const { Op, Sequelize } = require("sequelize");
 const Activity = require('../../domain/models/Activity');
 const AppointmentRequest = require('../../domain/models/AppointmentRequest');
 const User = require('../../domain/models/User');
@@ -65,6 +66,62 @@ exports.createActivity = async (req, res) => {
   }
 };
 
+exports.getAllActivities = async (req, res) => {
+  try {
+    let { page = 1, limit = 10, search = '' } = req.query;
+    page = parseInt(page, 10) || 1;
+    limit = parseInt(limit, 10) || 10;
+    const offset = (page - 1) * limit;
+
+    const whereClause = {};
+
+    if (search && search.trim() !== '') {
+      search = search.trim().toLowerCase();
+
+      // Filter kryesor
+      whereClause[Op.or] = [
+        Sequelize.where(
+          Sequelize.fn('LOWER', Sequelize.col('activity_plan')),
+          'LIKE',
+          `%${search}%`
+        ),
+        Sequelize.literal(`EXISTS (
+          SELECT 1 FROM Users AS u
+          WHERE u.id = Activity.user_id
+          AND LOWER(CONCAT(u.first_name, ' ', u.last_name)) LIKE '%${search}%'
+        )`)
+      ];
+    }
+
+    const { count, rows } = await Activity.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'first_name', 'last_name']
+        },
+        {
+          model: AppointmentRequest,
+          attributes: ['id', 'scheduled_date', 'status']
+        }
+      ],
+      order: [['created_at', 'DESC']],
+      limit,
+      offset,
+    });
+
+    res.json({
+      activities: rows || [],
+      page,
+      totalPages: Math.ceil(count / limit),
+      totalActivities: count,
+    });
+  } catch (err) {
+    console.error("GET ALL ACTIVITIES ERROR:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 
 exports.getUserActivities = async (req, res) => {
   try {
@@ -72,6 +129,12 @@ exports.getUserActivities = async (req, res) => {
 
     const activities = await Activity.findAll({
       where: { user_id: userId },
+      include: [
+        {
+          model: AppointmentRequest,
+          attributes: ['id', 'scheduled_date', 'status']
+        }
+      ],
       order: [['created_at', 'DESC']]
     });
 
@@ -86,7 +149,13 @@ exports.getActivityById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const activity = await Activity.findByPk(id);
+    const activity = await Activity.findByPk(id, {
+      include: [
+        { model: User, attributes: ['id', 'first_name', 'last_name'] },
+        { model: AppointmentRequest, attributes: ['id', 'scheduled_date', 'status'] }
+      ]
+    });
+
     if (!activity) {
       return res.status(404).json({ message: "Activity not found" });
     }
@@ -94,29 +163,6 @@ exports.getActivityById = async (req, res) => {
     return res.json(activity);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-exports.getAllActivities = async (req, res) => {
-  try {
-    const activities = await Activity.findAll({
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'first_name', 'last_name']
-        },
-        {
-          model: AppointmentRequest,
-          attributes: ['id', 'scheduled_date', 'status']
-        }
-      ],
-      order: [['created_at', 'DESC']]
-    });
-
-    return res.json(activities);
-  } catch (err) {
-    console.error("GET ALL ACTIVITIES ERROR:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -133,10 +179,7 @@ exports.updateActivity = async (req, res) => {
 
     if (request_id && request_id !== activity.request_id) {
       const appointment = await AppointmentRequest.findOne({
-        where: {
-          id: request_id,
-          user_id: activity.user_id,
-        },
+        where: { id: request_id, user_id: activity.user_id }
       });
 
       if (!appointment) {
@@ -153,14 +196,24 @@ exports.updateActivity = async (req, res) => {
 
     await activity.save();
 
+    if (req.user) {
+      await createAuditLog({
+        userId: req.user.id,
+        username: req.user.username,
+        role: req.user.role,
+        action: "update",
+        entity: "Activity",
+        entityId: activity.id,
+        description: `U përditësua aktiviteti me ID=${activity.id}`
+      });
+    }
+
     res.json(activity);
   } catch (err) {
     console.error("UPDATE ACTIVITY ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
-
-
 
 exports.deleteActivity = async (req, res) => {
   try {
@@ -172,10 +225,22 @@ exports.deleteActivity = async (req, res) => {
     }
 
     await activity.destroy();
+
+    if (req.user) {
+      await createAuditLog({
+        userId: req.user.id,
+        username: req.user.username,
+        role: req.user.role,
+        action: "delete",
+        entity: "Activity",
+        entityId: activity.id,
+        description: `U fshi aktiviteti me ID=${activity.id}`
+      });
+    }
+
     return res.json({ message: "Activity deleted successfully" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
   }
 };
-

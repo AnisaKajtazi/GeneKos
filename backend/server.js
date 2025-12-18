@@ -34,7 +34,6 @@ const adminActivitiesRoutes = require('./src/presentation/routes/adminActivities
 const auditLogRoutes = require('./src/presentation/routes/auditLogRoutes');
 const adminAppointmentRoutes = require('./src/presentation/routes/adminAppointmentRoutes');
 const adminDietRoutes = require("./src/presentation/routes/adminDietRoutes");
-
 const clinicUsersRoutes = require("./src/presentation/routes/clinicUsersRoutes");
 const adminAnalysisRoutes = require("./src/presentation/routes/adminAnalysisRoutes");
 const userHealthProfileRoutes = require("./src/presentation/routes/userHealthProfileRoutes");
