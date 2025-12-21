@@ -214,7 +214,7 @@ const Register = () => {
               <input
                 id="phone"
                 name="phone"
-                placeholder="+355 00 000 0000"
+                placeholder="+383 00 000 0000"
                 value={form.phone}
                 onChange={handleChange}
                 className="form-input"

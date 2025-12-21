@@ -1,160 +1,71 @@
-const AppointmentRequest = require("../../domain/models/AppointmentRequest");
-const { slots, isValidSlot } = require("../utils/appointmentSlots");
-const { Op } = require("sequelize");
-
+const appointmentService = require("../../services/appointmentService");
 
 exports.createAppointment = async (req, res) => {
   try {
-    const { user_id, scheduled_date, note } = req.body;
-
-    if (!user_id || !scheduled_date)
-      return res.status(400).json({ message: "user_id and scheduled_date are required" });
-
-    const today = new Date().setHours(0, 0, 0, 0);
-    const chosen = new Date(scheduled_date).setHours(0, 0, 0, 0);
-
-    if (chosen < today) {
-      return res.status(400).json({ message: "Past dates are not allowed" });
-    }
-
-    const time = scheduled_date.slice(11, 16);
-
-    if (!isValidSlot(time))
-      return res.status(400).json({ message: "Invalid slot selected" });
-
-    const exists = await AppointmentRequest.findOne({
-      where: {
-        scheduled_date,
-        status: { [Op.in]: ["pending", "scheduled"] }
-      }
-    });
-
-    if (exists)
-      return res.status(409).json({ message: "This appointment slot is already taken." });
-
-    const appointment = await AppointmentRequest.create({
-      user_id,
-      scheduled_date,
-      note
-    });
-
-    return res.status(201).json({
-      message: "Appointment request submitted successfully!",
-      appointment
-    });
-
+    const result = await appointmentService.createAppointment(req.body);
+    res.status(201).json(result);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
-
 
 exports.getAvailableSlots = async (req, res) => {
   try {
-    const { date } = req.query;
-    if (!date) return res.status(400).json({ message: "Date is required" });
-
-    const appointments = await AppointmentRequest.findAll({
-      where: {
-        scheduled_date: {
-          [Op.like]: `${date}%`
-        },
-        status: { [Op.in]: ["pending", "scheduled"] }
-      }
-    });
-
-    const takenSlots = appointments.map(a => a.scheduled_date.slice(11, 16));
-    const availableSlots = slots.filter(slot => !takenSlots.includes(slot));
-
-    return res.json({ date, available_slots: availableSlots });
-
+    const slots = await appointmentService.getAvailableSlots(req.query.date);
+    res.json(slots);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
-
 
 exports.getUserAppointments = async (req, res) => {
   try {
-    const { userId } = req.params;
-    if (!userId) return res.status(400).json({ message: "User ID is required" });
-
-    const appointments = await AppointmentRequest.findAll({
-      where: { user_id: userId },
-      order: [["scheduled_date", "ASC"]]
-    });
-
-    return res.json({ appointments });
+    const appointments = await appointmentService.getUserAppointments(req.params.userId);
+    res.json({ appointments });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
-
 
 exports.getPendingAppointments = async (req, res) => {
   try {
-    const appointments = await AppointmentRequest.findAll({
-      where: { status: 'pending' },
-      order: [['request_date', 'ASC']]
-    });
-    return res.json(appointments);
+    const pending = await appointmentService.getPendingAppointments();
+    res.json(pending);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
-
 
 exports.approveAppointment = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const appointment = await AppointmentRequest.findByPk(id);
-    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-
-    appointment.status = 'scheduled';
-    await appointment.save();
-
-    return res.json({ message: "Appointment approved", appointment });
-
+    const approved = await appointmentService.approveAppointment(req.params.id);
+    res.json({ message: "Appointment approved", appointment: approved });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
-
 
 exports.cancelAppointment = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const appointment = await AppointmentRequest.findByPk(id);
-    if (!appointment) return res.status(404).json({ message: "Appointment not found" });
-
-    appointment.status = 'cancelled';
-    await appointment.save();
-
-    return res.json({ message: "Appointment cancelled", appointment });
-
+    const cancelled = await appointmentService.cancelAppointment(req.params.id);
+    res.json({ message: "Appointment cancelled", appointment: cancelled });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
 
-
 exports.getAllAppointmentRequests = async (req, res) => {
   try {
-    const requests = await AppointmentRequest.findAll({
-      attributes: ['id', 'scheduled_date', 'status'],
-      order: [['scheduled_date', 'ASC']]
-    });
-    return res.json(requests);
+    const requests = await appointmentService.getAllAppointmentRequests();
+    res.json(requests);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error" });
+    res.status(err.status || 500).json({ message: err.message || "Server error" });
   }
 };
