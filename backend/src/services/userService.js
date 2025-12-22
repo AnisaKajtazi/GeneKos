@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { Op, Sequelize } = require("sequelize");
+
 const userRepository = require("../domain/repositories/userRepository");
 const auditLogService = require("./auditLogService");
 
@@ -66,23 +67,20 @@ class UserService {
 
   async createUser(data, currentUser) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
+
     const newUser = await userRepository.create({
       ...data,
       password: hashedPassword,
       is_active: true,
     });
 
-    if (currentUser) {
-      await auditLogService.log({
-        userId: currentUser.id,
-        username: currentUser.username,
-        role: currentUser.role,
-        action: "create",
-        entity: "User",
-        entityId: newUser.id,
-        description: `U krijua përdoruesi ${newUser.username}`,
-      });
-    }
+    await auditLogService.logAudit({
+      user: currentUser,
+      action: "create",
+      entity: "User",
+      entityId: newUser.id,
+      description: `U krijua përdoruesi ${newUser.username}`,
+    });
 
     return newUser;
   }
@@ -97,17 +95,13 @@ class UserService {
     const user = await userRepository.update(id, data);
     if (!user) return null;
 
-    if (currentUser) {
-      await auditLogService.log({
-        userId: currentUser.id,
-        username: currentUser.username,
-        role: currentUser.role,
-        action: "update",
-        entity: "User",
-        entityId: user.id,
-        description: `U përditësua përdoruesi ${user.username}`,
-      });
-    }
+    await auditLogService.logAudit({
+      user: currentUser,
+      action: "update",
+      entity: "User",
+      entityId: user.id,
+      description: `U përditësua përdoruesi ${user.username}`,
+    });
 
     return user;
   }
@@ -116,17 +110,13 @@ class UserService {
     const user = await userRepository.update(id, { is_active: false });
     if (!user) return false;
 
-    if (currentUser) {
-      await auditLogService.log({
-        userId: currentUser.id,
-        username: currentUser.username,
-        role: currentUser.role,
-        action: "delete",
-        entity: "User",
-        entityId: user.id,
-        description: `U fshi përdoruesi ${user.username}`,
-      });
-    }
+    await auditLogService.logAudit({
+      user: currentUser,
+      action: "delete",
+      entity: "User",
+      entityId: user.id,
+      description: `U fshi përdoruesi ${user.username}`,
+    });
 
     return true;
   }

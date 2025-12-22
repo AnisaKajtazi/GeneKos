@@ -3,12 +3,10 @@ const router = express.Router();
 
 const authMiddleware = require("../../infrastructure/middleware/authMiddleware");
 const authorizeRole = require("../../infrastructure/middleware/authorizeRole");
-
 const userController = require("../controllers/userController");
 
-
 router.use(authMiddleware);
-router.use(authorizeRole(["admin"]));
+router.use(authorizeRole(["admin"])); 
 
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getUserById);
