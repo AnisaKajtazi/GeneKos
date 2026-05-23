@@ -23,6 +23,7 @@
     "multer": "^2.0.2"
   },
   "devDependencies": {
-    "cypress": "^15.15.0"
+    "cypress": "^15.15.0",
+    "wait-on": "^9.0.10"
   }
 }
